@@ -1,0 +1,79 @@
+.form-control:disabled, .form-control[readonly] {
+    background-color: #fff;
+    color: #000;
+}
+.custom-select:disabled {
+    background-color: #fff;
+    color: #000;
+}
+.custom-select[readonly], fieldset[disabled] .custom-select {
+    background-color: #fff;
+    opacity: 1;
+}
+.form-control[readonly], fieldset[disabled] .form-control {
+    background-color: #fff;
+    opacity: 1;
+}
+tr.tr-emr:hover {
+    cursor: pointer;
+}
+.emr-sub-menu {
+    text-transform: uppercase;
+    border-bottom: 1px solid #dee2e6;
+    font-weight: bold;
+    margin-top: 10px;
+}
+td, th {
+    vertical-align: middle !important;
+}
+tr.tr-emr td {
+    vertical-align: middle !important;
+}
+
+tr.tr-emr td button {
+    margin: 2px 2px;
+}
+
+tr.tr-emr td a {
+    margin: 2px 2px;
+}
+
+label.required::after {
+    content: "*";
+    color: red;
+    margin-left: 5px;
+}
+
+select {
+    width: 100%;
+}
+
+.status-bar {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    padding: 5px 10px 5px 10px;
+    margin-bottom: 10px;
+    flex-basis: auto;
+    float: right;
+}
+.status-bar::after {
+    /* add br html */
+    content: "";
+    clear: both;
+    display: table;
+}
+.status-bar .status-bar-item {
+    float: left;
+    margin-right: 10px;
+    padding: 5px 10px 5px 10px;
+    text-transform: uppercase;
+}
+
+.status-bar .status-bar-item.selected {
+    background-color: #20c997;
+    color: #ffffff;
+    font-weight: bold;
+    border-radius: 20px;
+    padding: 5px 10px 5px 10px;
+}
