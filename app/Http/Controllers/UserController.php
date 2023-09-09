@@ -157,7 +157,7 @@ class UserController extends Controller
         // request and save file
         if ($request->foto_base64 != '' or $request->foto_base64 != null) {
             if ($request->foto_lama != '' or $request->foto_lama != null) {
-                $file_path = asset('/asset/img/profile_users/' . $request->foto_lama);
+                $file_path = public_path() . '/assets/img/profile_users/' . $request->foto_lama;
                 if (file_exists($file_path)) {
                     unlink($file_path);
                 }
@@ -169,8 +169,8 @@ class UserController extends Controller
             $file = base64_decode($file);
             $file_name = time() . '-' . $request->nama_foto;
             // save to public path
-            $file_path = asset('/asset/img/profile_users/' . $file_name);
-            fwrite(fopen($file_path, 'w'), $file);
+            $file_path = public_path() . '/asset/img/profile_users/' . $file_name;
+            file_put_contents($file_path, $file);
             // update session detail_user->file_foto
             $data_detail = [
                 'nama_lengkap' => $request->nama_user,
