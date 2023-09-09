@@ -5,7 +5,7 @@
 @section('content')
 <div class="login-box">
     <div class="login-logo">
-        <a href="#"><b>Fatima</b>Medical Record</a>
+        <a href="#"><b>Fatima</b> Medical Record</a>
     </div>
     <div class="card">
         <div class="card-body login-card-body">
