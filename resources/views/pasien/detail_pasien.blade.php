@@ -3,18 +3,20 @@
 @endsection
 @section('content')
 <form method="POST" action="/data-pasien/edit" id="form_edit_data_pasien">
-<button type="button" class="btn btn-danger" id="btn-hapus-data-pasien" style="float: right;" data-toggle="modal" data-target="#modal-hapus-pasien" data-id="{{$pasien->id}}" data-nama="{{$pasien->nama_pasien}}">
-    <i class="fas fa-trash"></i>
-</button>
-<button type="button" class="btn btn-info" id="btn-edit-data-pasien">
-    Edit Data Pasien
-</button>
-<button type="button" class="btn btn-danger" id="btn-cancel-edit-data-pasien" style="display: none;">
-    Cancel
-</button>
-<button type="button" class="btn btn-success" id="btn-save-data-pasien" style="display: none;" onclick="simpanDataPasien()">
-    Simpan Data Pasien
-</button>
+@if(in_array(Auth::user()->role, ['super-admin', 'admin']))
+    <button type="button" class="btn btn-danger" id="btn-hapus-data-pasien" style="float: right;" data-toggle="modal" data-target="#modal-hapus-pasien" data-id="{{$pasien->id}}" data-nama="{{$pasien->nama_pasien}}">
+        <i class="fas fa-trash"></i>
+    </button>
+    <button type="button" class="btn btn-info" id="btn-edit-data-pasien">
+        Edit Data Pasien
+    </button>
+    <button type="button" class="btn btn-danger" id="btn-cancel-edit-data-pasien" style="display: none;">
+        Cancel
+    </button>
+    <button type="button" class="btn btn-success" id="btn-save-data-pasien" style="display: none;" onclick="simpanDataPasien()">
+        Simpan Data Pasien
+    </button>
+@endif
 <a href="{{url('/rm-pasien/detail/'.$no_rm)}}" class="btn btn-primary" id="btn-rm-pasien">
     Rekam Medis Pasien
 </a>

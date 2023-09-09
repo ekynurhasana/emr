@@ -7,6 +7,12 @@
 @section('content')
 <div class="row">
     <div class="col-sm-12 col-md-6 col-lg-6">
+        <a href="{{url('/rawat-jalan/detail/'.$data->pendaftaran_id)}}" class="btn btn-info">
+            Detail Perawatan
+        </a>
+        <a href="{{url('/rm-pasien/detail/'.$data->no_erm)}}" class="btn btn-info">
+            Detail Rekam Medik
+        </a>
         @if ($data->status == 'draft')
             <button type="button" class="btn btn-warning" id="btn-proses" onclick="diproses()">
                 <i class="fas fa-check"></i> Proses Resep Obat
@@ -22,6 +28,7 @@
             <span class="status-bar-item {{$data->status == 'draft' ? 'selected' : ''}}">Baru</span>
             <span class="status-bar-item {{$data->status == 'diproses' ? 'selected' : ''}}">Diproses</span>
             <span class="status-bar-item {{$data->status == 'selesai' ? 'selected' : ''}}">Selesai</span>
+            <span class="status-bar-item {{$data->status == 'batal' ? 'selected' : ''}}">Batal</span>
         </div>
     </div>
 </div>
@@ -133,7 +140,7 @@
                                     @foreach($data_line as $line)
                                         <tr>
                                             <td class="text-center">{{$loop->iteration}}</td>
-                                            <td class="text-center">{{$line->nama_obat}}</td>
+                                            <td class="text-center">{{$line->obat}}</td>
                                             <td class="text-center">{{$line->qty}}</td>
                                             <td class="text-center">{{$line->satuan}}</td>
                                             <td class="text-center">{{$line->aturan_pakai}}</td>

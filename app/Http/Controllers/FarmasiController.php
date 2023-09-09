@@ -55,7 +55,6 @@ class FarmasiController extends Controller
             $jenis_obat = $request->jenis_obat;
             $harga_obat = $request->harga_obat;
             $harga_obat = str_replace('.', '', $harga_obat);
-            $harga_obat = str_replace(',', '', $harga_obat);
             $stok_obat = $request->stok_obat;
 
             $data = [
@@ -123,6 +122,17 @@ class FarmasiController extends Controller
     {
         if ($request->isMethod('delete')) {
             $id = $request->id_obat;
+            $resep_obat_line = DB::table('data_resep_obat_pasien_line')->where('obat_id', $id)->get();
+            if (count($resep_obat_line) > 0) {
+                $update = [
+                    'obat_id' => null,
+                ];
+                try {
+                    DB::table('data_resep_obat_pasien_line')->where('obat_id', $id)->update($update);
+                } catch (\Throwable $th) {
+                    return redirect('data-obat/')->with('error', 'Data Obat gagal dihapus ' . $th->getMessage());
+                }
+            }
             try {
                 DB::table('data_obat')->where('id', $id)->delete();
                 return redirect('data-obat/')->with('success', 'Data Obat berhasil dihapus');
@@ -227,9 +237,11 @@ class FarmasiController extends Controller
             $satuan = $request->satuan;
             $aturan_pakai = $request->aturan_pakai;
             $keterangan = $request->keterangan;
+            $nama_obat = DB::table('data_obat')->where('id', $obat_id)->first()->nama_obat;
             $data = [
                 'resep_obat_pasien_id' => $resep_obat_pasien_id,
                 'obat_id' => $obat_id,
+                'obat' => $nama_obat,
                 'qty' => $qty,
                 'satuan' => $satuan,
                 'aturan_pakai' => $aturan_pakai,
@@ -239,6 +251,20 @@ class FarmasiController extends Controller
                 ->where('perawatan_id', $pendaftaran_id)
                 ->first();
             $obat = DB::table('data_obat')->where('id', $obat_id)->first();
+
+            $add_id = null;
+            try {
+                $add_id = DB::table('data_resep_obat_pasien_line')->insertGetId($data);
+            } catch (\Throwable $th) {
+                return redirect()->back()->with('error', 'Data Obat gagal ditambahkan '.$th->getMessage());
+            }
+
+            try {
+                DB::table('data_obat')->where('id', $obat_id)->decrement('stok_obat', $qty);
+            } catch (\Throwable $th) {
+                return redirect()->back()->with('error', 'Stok Obat gagal diperbaharui '.$th->getMessage());
+            }
+
             $data_tagihan_line = [
                 'tagihan_pasien_id' => $tagihan->id,
                 'jenis_tagihan' => 'obat',
@@ -246,25 +272,15 @@ class FarmasiController extends Controller
                 'harga' => $obat->harga_obat,
                 'qty' => $qty,
                 'total' => $obat->harga_obat * $qty,
+                'resep_obat_line_id' => $add_id,
             ];
             try {
                 DB::table('data_tagihan_pasien_line')->insert($data_tagihan_line);
             } catch (\Throwable $th) {
-                return redirect('resep-obat/detail/'.$resep_obat_pasien_id)->with('error', 'Data Tagihan gagal ditambahkan '.$th->getMessage());
+                return redirect()->back()->with('error', 'Data Tagihan gagal ditambahkan '.$th->getMessage());
             }
+            return redirect()->back()->with('success', 'Data Obat berhasil ditambahkan');
 
-            try {
-                DB::table('data_obat')->where('id', $obat_id)->decrement('stok_obat', $qty);
-            } catch (\Throwable $th) {
-                return redirect('resep-obat/detail/'.$resep_obat_pasien_id)->with('error', 'Stok Obat gagal diperbaharui '.$th->getMessage());
-            }
-
-            try {
-                DB::table('data_resep_obat_pasien_line')->insert($data);
-                return redirect('resep-obat/detail/'.$resep_obat_pasien_id)->with('success', 'Data Obat berhasil ditambahkan');
-            } catch (\Throwable $th) {
-                return redirect('resep-obat/detail/'.$resep_obat_pasien_id)->with('error', 'Data Obat gagal ditambahkan '.$th->getMessage());
-            }
         }
     }
 
@@ -289,4 +305,59 @@ class FarmasiController extends Controller
         }
     }
 
+    public function resep_obat_hapus(Request $request){
+        if($request->isMethod('delete')){
+            $id = $request->id_resep;
+            $line = DB::table('data_resep_obat_pasien_line')->where('resep_obat_pasien_id', $id)->get();
+            if(count($line) > 0){
+                foreach($line as $l){
+                    $delete = $this->delete_obat_line($l->id);
+                    if($delete == TRUE){
+                        continue;
+                    } else {
+                        return redirect()->back()->with('error', 'Data Obat gagal dihapus');
+                    }
+                }
+            }
+            try {
+                DB::table('data_resep_obat_pasien')->where('id', $id)->delete();
+                return redirect('resep-obat/')->with('success', 'Data Resep Obat berhasil dihapus');
+            } catch (\Throwable $th) {
+                return redirect('resep-obat/')->with('error', 'Data Resep Obat gagal dihapus '.$th->getMessage());
+            }
+        }
+    }
+
+    public function resep_obat_hapus_obat(Request $request){
+        if($request->isMethod('delete')){
+            $id = $request->id_obat_line;
+            // call function delete_obat_line
+            $delete = $this->delete_obat_line($id);
+            if($delete == TRUE){
+                return redirect()->back()->with('success', 'Data Obat berhasil dihapus');
+            } else {
+                return redirect()->back()->with('error', 'Data Obat gagal dihapus');
+            }
+        }
+    }
+
+    private function delete_obat_line($id){
+        $resep_obat_line = DB::table('data_resep_obat_pasien_line')->where('id', $id)->first();
+        try {
+            DB::table('data_tagihan_pasien_line')->where('resep_obat_line_id', $id)->delete();
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('error', 'Data Tagihan gagal dihapus '.$th->getMessage());
+        }
+        try {
+            DB::table('data_obat')->where('id', $resep_obat_line->obat_id)->increment('stok_obat', $resep_obat_line->qty);
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('error', 'Stok Obat gagal diperbaharui '.$th->getMessage());
+        }
+        try {
+            DB::table('data_resep_obat_pasien_line')->where('id', $id)->delete();
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('error', 'Data Obat gagal dihapus '.$th->getMessage());
+        }
+        return True;
+    }
 }

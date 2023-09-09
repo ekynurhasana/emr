@@ -7,11 +7,13 @@
 @section('content')
 {{-- <div --}}
 <div class="row">
+    @if(in_array(Auth::user()->role, ['super-admin', 'admin']))
     <div class="col-md-4 col-sm-12 col-xs-12">
         <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modal-tambah-pasien">
             Tambah Pasien Baru
         </button>
     </div>
+    @endif
 </div><br>
 <div class="row">
     <div class="col-md-12 col-sm-12 col-xs-12">
@@ -39,9 +41,11 @@
                                 <td>{{$pasien->alamat}}</td>
                                 <td class="text-center">
                                     <a href="{{url('/data-pasien/detail/'.$pasien->id)}}" class="btn btn-primary btn-sm"><i class="fas fa-eye"></i> </a>
+                                    @if(in_array(Auth::user()->role, ['super-admin', 'admin']))
                                     <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#modal-hapus-pasien" data-id="{{$pasien->id}}" data-nama="{{$pasien->nama_pasien}}">
                                         <i class="fas fa-trash"></i>
                                     </button>
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach

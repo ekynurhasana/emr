@@ -157,7 +157,10 @@ class UserController extends Controller
         // request and save file
         if ($request->foto_base64 != '' or $request->foto_base64 != null) {
             if ($request->foto_lama != '' or $request->foto_lama != null) {
-                Storage::delete('public/foto_profil/' . $request->foto_lama);
+                $file_path = public_path() . '/assets/img/profile_users/' . $request->foto_lama;
+                if (file_exists($file_path)) {
+                    unlink($file_path);
+                }
             }
             $file = $request->foto_base64;
             // convert to base64_decode
@@ -165,7 +168,10 @@ class UserController extends Controller
             $file = str_replace(' ', '+', $file);
             $file = base64_decode($file);
             $file_name = time() . '-' . $request->nama_foto;
-            Storage::put('public/foto_profil/' . $file_name, $file);
+            // save to public path
+            $file_path = public_path() . '/asset/img/profile_users/' . $file_name;
+            file_put_contents($file_path, $file);
+            // update session detail_user->file_foto
             $data_detail = [
                 'nama_lengkap' => $request->nama_user,
                 'jabatan' => $jabatan,
@@ -198,6 +204,10 @@ class UserController extends Controller
             $update_user = DB::table('users')->where('id', $id)->update($data_user);
             try {
                 $update_detail = DB::table('detail_user')->where('id', $id_detail)->update($data_detail);
+                $detail_user = DB::table('detail_user')->where('user_id', $id)->first();
+                session([
+                    'detail_user' => $detail_user,
+                ]);
                 return redirect('users/detail/' . $id)->with('success', 'Data berhasil diubah');
             } catch (\Illuminate\Database\QueryException $e) {
                 return redirect('users/detail/' . $id)->with('error', 'Data gagal diubah\n' . $e->getMessage());

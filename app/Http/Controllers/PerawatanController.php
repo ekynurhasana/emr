@@ -114,6 +114,17 @@ class PerawatanController extends Controller
                 ->select('data_asuransi_pasien.*', 'data_asuransi.nama_asuransi as nama_asuransi')
                 ->first();
         }
+        $resep_line = null;
+        if ($pendaftaran_pasien->status == 'selesai') {
+            $resep_line = DB::table('data_resep_obat_pasien_line')
+                ->join('data_resep_obat_pasien', 'data_resep_obat_pasien_line.resep_obat_pasien_id', '=', 'data_resep_obat_pasien.id')
+                ->where('data_resep_obat_pasien.pendaftaran_id', $pendaftaran_pasien->id)
+                ->select(
+                    'data_resep_obat_pasien_line.*',
+                    'data_resep_obat_pasien.no_resep as no_resep'
+                )
+                ->get();
+        }
         $data = [
             'title' => $title,
             'menu_slug' => 'rawat-jalan',
@@ -125,6 +136,7 @@ class PerawatanController extends Controller
             'last_antrean' => $last_antrean,
             'erm' => $rm,
             'asuransi' => $asuransi,
+            'resep_line' => $resep_line,
         ];
         return view('perawatan.pendaftaran_detail', $data);
     }
@@ -170,6 +182,14 @@ class PerawatanController extends Controller
         }
         $dokter_poli_id = explode(',', $request->pilih_dokter)[1];
         $dokter_id = explode(',', $request->pilih_dokter)[0];
+        $pendaftaran_pasie_today = DB::table('data_pendaftar_perawatan')
+            ->where('tanggal_pendaftaran', date('Y-m-d'))
+            ->where('pasien_id', $pasien_id)
+            ->where('dokter_poli_id', $dokter_poli_id)
+            ->count();
+        if($pendaftaran_pasie_today > 0){
+            return redirect('rawat-jalan/pendaftaran')->with('error', 'Pasien sudah terdaftar di poli yang sama hari ini!');
+        }
         $data = [
             'pasien_id' => $pasien_id,
             'poli_id' => $request->pilih_poli,
@@ -255,6 +275,7 @@ class PerawatanController extends Controller
         ]);
         $model = new DataPendaftarPerawatanModel();
         $data = [
+            'alergi_obat' => $request->alergi_obat ?? '',
             'keluhan' => $request->keluhan,
             'riwayat_penyakit' => $request->riwayat_penyakit ?? '',
             'tekanan_darah' => $request->tekanan_darah,
@@ -264,6 +285,13 @@ class PerawatanController extends Controller
             'suhu_badan' => $request->suhu_badan ?? '',
             'pemeriksaan_fisik_lainnya' => $request->pemeriksaan_fisik_lainnya ?? '',
         ];
+        if($request->alergi_obat != null || $request->alergi_obat != ''){
+            try {
+                $update = DB::table('data_pasien')->where('id', $request->id_pasien)->update(['alergi_obat' => $data['alergi_obat']]);
+            } catch (\Throwable $th) {
+                return redirect('rawat-jalan/detail/' . $request->id_pendaftaran)->with('error', 'Data gagal diupdate');
+            }
+        }
         try {
             $update = $model->where('id', $request->id_pendaftaran)->update($data);
             return redirect('rawat-jalan/detail/' . $request->id_pendaftaran)->with('success', 'Data berhasil ditambahkan');
@@ -443,6 +471,44 @@ class PerawatanController extends Controller
         }
     }
 
+    public function batal(Request $request)
+    {
+        $data = [
+            'status' => 'batal',
+        ];
+        $id = $request->id_pendaftaran;
+        $antrean = DB::table('conf_antrean_rawat_jalan')->where('pendaftaran_perawatan_id', $id)->first();
+        if ($antrean != null) {
+            try {
+                $batal_antrean = DB::table('conf_antrean_rawat_jalan')->where('pendaftaran_perawatan_id', $id)->update(['status' => 'batal']);
+            } catch (\Throwable $th) {
+                return redirect()->back()->with('error', 'Data antrean gagal dihapus');
+            }
+        }
+        $resep = DB::table('data_resep_obat_pasien')->where('pendaftaran_id', $id)->first();
+        if ($resep != null) {
+            try {
+                $batal_resep = DB::table('data_resep_obat_pasien')->where('pendaftaran_id', $id)->update(['status' => 'batal']);
+            } catch (\Throwable $th) {
+                return redirect()->back()->with('error', 'Data resep gagal dihapus');
+            }
+        }
+        $tagihan = DB::table('data_tagihan_pasien')->where('perawatan_id', $id)->first();
+        if ($tagihan != null) {
+            try {
+                $batal_tagihan = DB::table('data_tagihan_pasien')->where('perawatan_id', $id)->update(['status' => 'batal']);
+            } catch (\Throwable $th) {
+                return redirect()->back()->with('error', 'Data tagihan gagal dihapus');
+            }
+        }
+        try {
+            $update = DB::table('data_pendaftar_perawatan')->where('id', $request->id_pendaftaran)->update($data);
+            return redirect('rawat-jalan/detail/' . $request->id_pendaftaran)->with('success', 'Data berhasil diupdate');
+        } catch (\Throwable $th) {
+            return redirect('rawat-jalan/detail/' . $request->id_pendaftaran)->with('error', 'Data gagal diupdate');
+        }
+    }
+
     public function tambah_biaya(Request $request){
         if ($request->isMethod('post')) {
             $request->validate([
@@ -549,5 +615,58 @@ class PerawatanController extends Controller
             'poli' => $polis,
         ];
         return view('perawatan.pendaftaran', $data);
+    }
+
+    public function delete(Request $request)
+    {
+        // related table
+        // data_rekam_medis_pasien -> pendaftaran_id
+        // conf_antrean_rawat_jalan -> pendaftaran_perawatan_id
+        // data_tagihan_pasien -> perawatan_id
+        // data_tagihan_pasien_line -> tagihan_pasien_id
+        $id = $request->id;
+        if($request->isMethod('delete')){
+            $pendaftaran = DB::table('data_pendaftar_perawatan')->where('id', $id)->first();
+            $antrean = DB::table('conf_antrean_rawat_jalan')->where('pendaftaran_perawatan_id', $id)->first();
+            if ($antrean != null) {
+                try {
+                    $update_antrean = DB::table('conf_antrean_rawat_jalan')->where('pendaftaran_perawatan_id', $id)->update(['status' => 'batal', 'pendaftaran_perawatan_id' => null]);
+                } catch (\Throwable $th) {
+                    return redirect()->back()->with('error', 'Data antrean gagal dihapus');
+                }
+            }
+            $rm = DB::table('data_rekam_medis_pasien')->where('pendaftaran_id', $id)->first();
+            if ($rm != null) {
+                try {
+                    $update_rm = DB::table('data_rekam_medis_pasien')->where('pendaftaran_id', $id)->update(['pendaftaran_id' => null]);
+                } catch (\Throwable $th) {
+                    return redirect()->back()->with('error', 'Data rekam medis gagal dihapus');
+                }
+            }
+            $resep = DB::table('data_resep_obat_pasien')->where('pendaftaran_id', $id)->first();
+            if ($resep != null) {
+                try {
+                    $update_resep = DB::table('data_resep_obat_pasien')->where('pendaftaran_id', $id)->update(['pendaftaran_id' => null, 'status' => 'batal']);
+                } catch (\Throwable $th) {
+                    return redirect()->back()->with('error', 'Data resep gagal dihapus');
+                }
+            }
+            $tagihan = DB::table('data_tagihan_pasien')->where('perawatan_id', $id)->first();
+            if ($tagihan != null) {
+                try {
+                    $update_tagihan = DB::table('data_tagihan_pasien')->where('perawatan_id', $id)->update(['perawatan_id' => null, 'status' => 'batal']);
+                } catch (\Throwable $th) {
+                    return redirect()->back()->with('error', 'Data tagihan gagal dihapus');
+                }
+            }
+            try {
+                $delete = DB::table('data_pendaftar_perawatan')->where('id', $id)->delete();
+                return redirect('rawat-jalan/pendaftaran')->with('success', 'Data berhasil dihapus');
+            } catch (\Throwable $th) {
+                return redirect()->back()->with('error', 'Data gagal dihapus');
+            }
+        } else {
+            return redirect()->back()->with('error', 'Data gagal dihapus');
+        }
     }
 }

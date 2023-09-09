@@ -7,30 +7,45 @@
 @section('content')
 <div class="row">
     <div class="col-sm-12 col-md-6 col-lg-6">
-        @if($data->status=="baru")
-            <div>
+        @if(in_array(Session::get('role'), ['super-admin', 'admin']))
+            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#modal-hapus" data-id="{{$data->id}}" data-nama="{{$data->nama_pasien}}">
+                <i class="fas fa-trash"></i>
+            </button>
+            {{-- cek data status not in ['selesai', 'batal'] --}}
+            @if(in_array($data->status, ['baru', 'antri']))
+                <button type="button" class="btn btn-danger" id="btn-batal" onclick="batalPasien()">
+                    Batal Periksa
+                </button>
+            @endif
+        @endif
+        @if(in_array(Session::get('role'), ['super-admin', 'admin']))
+            @if($data->status=="baru")
                 <button type="button" class="btn btn-warning" id="btn-antri" onclick="antriPasien()">
                     Masukkan ke Antrian
                 </button>
-            </div>
-        @elseif($data->status=="antri")
-            <div>
+            @endif
+        @endif
+        @if(in_array(Session::get('role'), ['super-admin', 'perawat', 'dokter']))
+            @if($data->status=="antri")
                 <button type="button" class="btn btn-success" id="btn-periksa" onclick="antriPasien()">
                     Panggil Pasien
                 </button>
                 <button type="button" class="btn btn-info" id="btn-tambah-biaya" data-toggle="modal" data-target="#modal-tambah-biaya" onclick="tambahBiaya()">
                     Tambah Biaya
                 </button>
-            </div><span style="margin-bottom:10px" class="badge badge-warning">Terakhir dipanggil: {{$last_antrean != null ? $last_antrean->no_antreaan : '-'}}</span>
-            @elseif($data->status=="diperiksa")
-            <div>
+            @endif
+            @if($data->status=="diperiksa")
                 <button type="button" class="btn btn-success" id="btn-selesai" onclick="antriPasien()">
                     Selesai Periksa
                 </button>
                 <button type="button" class="btn btn-info" id="btn-tambah-biaya" data-toggle="modal" data-target="#modal-tambah-biaya" onclick="tambahBiaya()">
                     Tambah Biaya
                 </button>
-            </div>
+            @endif
+        @endif
+        @if($data->status=="antri")
+            <br/>
+            <span style="margin-bottom:10px" class="badge badge-warning">Terakhir dipanggil: {{$last_antrean != null ? $last_antrean->no_antreaan : '-'}}</span>
         @endif
     </div>
     <div class="col-sm-12 col-md-6 col-lg-6">
@@ -49,7 +64,7 @@
         <div class="info-box">
             <span class="info-box-icon bg-warning elevation-2"><i class="fas fa-list-ol"></i></span>
             <div class="info-box-content">
-                <span class="info-box-text">Nomo Antrean</span>
+                <span class="info-box-text">Nomor Antrean</span>
                 <span class="info-box-number">{{$no_antrian->no_antrian}}</span>
             </div>
         </div>
@@ -98,11 +113,13 @@
                 <div style="float: left">
                     <h3 class="card-title">Data Pasien</h3>
                 </div>
-                <div style="float: right">
-                    <a href="{{url('/data-pasien/detail/'.$data->id_pasien)}}" class="btn btn-warning" id="btn-rm-pasien">
-                        Lengkapi Data Pasien
-                    </a>
-                </div>
+                @if(in_array(Session::get('role'), ['super-admin', 'admin']))
+                    <div style="float: right">
+                        <a href="{{url('/data-pasien/detail/'.$data->id_pasien)}}" class="btn btn-warning" id="btn-rm-pasien">
+                            Lengkapi Data Pasien
+                        </a>
+                    </div>
+                @endif
             </div>
         @else
         <div class="card card-info card-outline">
@@ -178,23 +195,26 @@
             @csrf
             <input type="method" name="_method" value="PUT" id="_method" hidden>
             <input type="hidden" name="id_pendaftaran" value="{{$data->id}}">
+            <input type="hidden" name="id_pasien" value="{{$data->id_pasien}}">
             <div class="card card-info card-outline">
                 <div class="card-header">
                     <div style="float: left;">
                         <h3 class="card-title">Screening Pasien</h3>
                     </div>
-                    @if(in_array($data->status, ['antri']))
-                        <div style="float: right;">
-                            <button type="button" class="btn btn-info" id="btn-edit-screening" onclick="editScreening()">
-                                Edit Screening Pasien
-                            </button>
-                            <button type="button" class="btn btn-success" id="btn-save-screening" style="display: none" onclick="alertScreening()">
-                                Simpan Screening Pasien
-                            </button>
-                            <button type="button" class="btn btn-danger" id="btn-batal-screening" style="display: none" onclick="batalScreening()">
-                                Cancel
-                            </button>
-                        </div>
+                    @if(in_array(Session::get('role'), ['super-admin', 'perawat', 'dokter']))
+                        @if(in_array($data->status, ['antri']))
+                            <div style="float: right;">
+                                <button type="button" class="btn btn-info" id="btn-edit-screening" onclick="editScreening()">
+                                    Edit Screening Pasien
+                                </button>
+                                <button type="button" class="btn btn-success" id="btn-save-screening" style="display: none" onclick="alertScreening()">
+                                    Simpan Screening Pasien
+                                </button>
+                                <button type="button" class="btn btn-danger" id="btn-batal-screening" style="display: none" onclick="batalScreening()">
+                                    Cancel
+                                </button>
+                            </div>
+                        @endif
                     @endif
                 </div>
                 <div class="card-body">
@@ -291,6 +311,15 @@
                         @enderror
                     </div>
                     <div class="form-group">
+                        <label for="alergi_obat">Alergi Obat</label>
+                        <textarea id="alergi_obat" class="form-control @error('alergi_obat') is-invalid @enderror" readonly name="alergi_obat">{{$data->alergi_obat}}</textarea>
+                        @error('alergi_obat')
+                            <div class="invalid-feedback">
+                                {{$message}}
+                            </div>
+                        @enderror
+                    </div>
+                    <div class="form-group">
                         <label for="pemeriksaan_fisik_lainnya">Pemeriksaan Fisik Lainnya</label>
                         <textarea id="pemeriksaan_fisik_lainnya" class="form-control @error('pemeriksaan_fisik_lainnya') is-invalid @enderror" readonly name="pemeriksaan_fisik_lainnya">{{$data->pemeriksaan_fisik_lainnya}}</textarea>
                         @error('pemeriksaan_fisik_lainnya')
@@ -313,8 +342,13 @@
                     </li>
                     @endif
                     <li class="nav-item">
-                        <a class="nav-link" id="emr-tabs-riwayat-tab" data-toggle="pill" href="#emr-tabs-riwayat" role="tab" aria-controls="emr-tabs-riwayat">Riwayat Rekam Medik</a>
+                        <a class="nav-link {{$data->status == 'selesai' ? 'active' : ''}}" id="emr-tabs-riwayat-tab" data-toggle="pill" href="#emr-tabs-riwayat" role="tab" aria-controls="emr-tabs-riwayat">Riwayat Rekam Medik</a>
                     </li>
+                    @if(!in_array($data->status, ['diperiksa']))
+                    <li class="nav-item">
+                        <a class="nav-link" id="emr-tabs-resep-obat-tab" data-toggle="pill" href="#emr-tabs-resep-obat" role="tab" aria-controls="emr-tabs-resep-obat">Detail Resep Obat</a>
+                    </li>
+                    @endif
                     {{-- <li class="nav-item">
                         <a class="nav-link" id="emr-tabs-riwayat-tindakan-tab" data-toggle="pill" href="#emr-tabs-riwayat-tindakan" role="tab" aria-controls="emr-tabs-riwayat-tindakan">Riwayat Implementasi Tindakan</a>
                     </li> --}}
@@ -325,16 +359,18 @@
                     @if(in_array($data->status, ['diperiksa']))
                     <div class="tab-pane fade show active" id="emr-tabs-add-rm" role="tabpanel" aria-labelledby="emr-tabs-add-rm-tab">
                         <div>
-                            <button type="button" class="btn btn-info" id="btn-periksa" onclick="periksa()">
-                                Periksa Pasien
-                            </button>
-                            <button type="button" class="btn btn-success" id="btn-add-pemeriksaan" style="display: none" onclick="addPemeriksaanCek()">
-                                Simpan Pemeriksaan
-                            </button>
-                            <button type="button" class="btn btn-danger" id="btn-batal-pemeriksaan" style="display: none" onclick="batalPemeriksaan()">
-                                Cancel
-                            </button>
-                            <br><br>
+                            @if(in_array(Session::get('role'), ['super-admin', 'dokter']))
+                                <button type="button" class="btn btn-info" id="btn-periksa" onclick="periksa()">
+                                    Periksa Pasien
+                                </button>
+                                <button type="button" class="btn btn-success" id="btn-add-pemeriksaan" style="display: none" onclick="addPemeriksaanCek()">
+                                    Simpan Pemeriksaan
+                                </button>
+                                <button type="button" class="btn btn-danger" id="btn-batal-pemeriksaan" style="display: none" onclick="batalPemeriksaan()">
+                                    Cancel
+                                </button>
+                                <br><br>
+                            @endif
                             <form action="/rawat-jalan/periksa" method="post" id="add-pemeriksaan">
                                 @csrf
                                 <input type="method" name="_method" value="PUT" id="_method" hidden>
@@ -410,7 +446,7 @@
                         </div>
                     </div>
                     @endif
-                    <div class="tab-pane fade" id="emr-tabs-riwayat" role="tabpanel" aria-labelledby="emr-tabs-riwayat-tab">
+                    <div class="tab-pane fade {{$data->status != 'diperiksa' ? 'show active' : ''}}" id="emr-tabs-riwayat" role="tabpanel" aria-labelledby="emr-tabs-riwayat-tab">
                         <div>
                             <table id="tabel_riwayat" class="table table-bordered table-hover">
                                 <thead>
@@ -440,6 +476,36 @@
                             </table>
                         </div>
                     </div>
+                    @if(in_array($data->status, ['selesai']))
+                    <div class="tab-pane fade" id="emr-tabs-resep-obat" role="tabpanel" aria-labelledby="emr-tabs-resep-obat-tab">
+                        <div>
+                            <table id="tabel_riwayat_tindakan" class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center" style="width: 10%">No. Resep</th>
+                                        <th class="text-center">Obat</th>
+                                        <th class="text-center">Jumlah</th>
+                                        <th class="text-center">Satuan</th>
+                                        <th class="text-center">Aturan Pakai</th>
+                                        <th class="text-center">Keterangan</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($resep_line as $ro)
+                                        <tr>
+                                            <td class="text-center">{{$ro->no_resep}}</td>
+                                            <td class="text-center">{{$ro->obat}}</td>
+                                            <td class="text-center">{{$ro->qty}}</td>
+                                            <td class="text-center">{{$ro->satuan}}</td>
+                                            <td class="text-center">{{$ro->aturan_pakai}}</td>
+                                            <td class="text-center">{{$ro->keterangan}}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    @endif
                     {{-- <div class="tab-pane fade" id="emr-tabs-riwayat-tindakan" role="tabpanel" aria-labelledby="emr-tabs-riwayat-tindakan-tab">
                         <div>
                             <table id="tabel_riwayat_tindakan" class="table table-bordered table-hover">
@@ -480,7 +546,30 @@
         </div>
     </div>
 </div>
-
+<div class="modal fade" id="modal-hapus" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content bg-danger">
+            <div class="modal-header">
+                <h4 class="modal-title">Danger!!!</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="modal_body_delete"></div>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-outline-light" data-dismiss="modal">Close</button>
+                <form id="form_delete_pasien" method="POST" action="/rawat-jalan/pendaftaran/delete">
+                    @csrf
+                    <input type="hidden" name="id" id="id">
+                    <input type="method" name="_method" value="DELETE" id="_method" hidden>
+                    <button type="submit" class="btn btn-outline-light">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 <div>
     <div class="modal fade" id="modal-hapus-riwayat" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
         <div class="modal-dialog">
@@ -515,6 +604,10 @@
     <input type="hidden" name="id_dokter_poli" id="id_dokter_poli" value="{{$data->dokter_poli_id}}">
     <input type="hidden" name="status" id="status" value="{{$data->status}}">
     <input type="hidden" name="tgl_periksa" id="tgl_periksa" value="{{$data->tgl_periksa}}">
+</form>
+<form id="form-batal" method="POST" action="/rawat-jalan/batal">
+    @csrf
+    <input type="hidden" name="id_pendaftaran" id="id_pendaftaran" value="{{$data->id}}">
 </form>
 <div class="modal fade" id="modal-tambah-biaya" tabindex="-1" role="definition" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-sm" role="document">
@@ -592,6 +685,18 @@
 <script src="{{asset('/adminlte/plugins/datatables-buttons/js/buttons.print.min.js')}}"></script>
 <script src="{{asset('/adminlte/plugins/datatables-buttons/js/buttons.colVis.min.js')}}"></script>
 <script>
+    $(document).ready(function(){
+        $('#modal-hapus').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget)
+            var id = button.data('id')
+            var nama = button.data('nama')
+            var modal = $(this)
+            modal.find('.modal-body #modal_body_delete').text('Apakah anda yakin ingin menghapus pendafataran atas nama '+nama+'?')
+            $('#id').val(id)
+        });
+    });
+</script>
+<script>
     $(function () {
         $("#tabel_riwayat").DataTable({
             "responsive": true, "lengthChange": false, "autoWidth": false,
@@ -613,6 +718,7 @@
     });
 
     function editScreening() {
+        $('#alergi_obat').removeAttr('readonly');
         $('#keluhan').removeAttr('readonly');
         $('#riwayat_penyakit').removeAttr('readonly');
         $('#berat_badan').removeAttr('readonly');
@@ -769,6 +875,23 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 $('#form-antri').submit();
+            }
+        })
+    }
+
+    function batalPasien() {
+        Swal.fire({
+            title: 'Apakah anda yakin?',
+            text: "Pendaftaran pasien akan dibatalkan!",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Batalkan',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $('#form-batal').submit();
             }
         })
     }

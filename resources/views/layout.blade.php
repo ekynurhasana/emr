@@ -51,7 +51,7 @@
 
                 <ul class="navbar-nav ml-auto">
                     <!-- Notifications Dropdown Menu -->
-                    <li class="nav-item dropdown">
+                    {{-- <li class="nav-item dropdown">
                         <a class="nav-link" data-toggle="dropdown" href="#">
                             <i class="far fa-bell"></i>
                             <span class="badge badge-warning navbar-badge">15</span>
@@ -76,7 +76,7 @@
                             <div class="dropdown-divider"></div>
                             <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
                         </div>
-                    </li>
+                    </li> --}}
                     <li class="nav-item">
                         <a class="nav-link" data-widget="fullscreen" href="#" role="button">
                             <i class="fas fa-expand-arrows-alt"></i>
@@ -85,7 +85,15 @@
                     {{-- profile --}}
                     <li class="nav-item dropdown">
                         <a class="nav-link" data-toggle="dropdown" href="#">
-                            <img src="{{asset('/storage/foto_profil/'.Session::get('detail_user')->file_foto)}}" class="img-circle elevation-2" alt="User Image" style="width: 30px; height: 30px;">
+                            @if(Session::get('detail_user')->file_foto == null)
+                                @if(Session::get('detail_user')->jenis_kelamin == 'L')
+                                    <img src="{{asset('/asset/img/avatar-lk.png')}}" class="img-circle elevation-2" alt="User Image" style="width: 30px; height: 30px;">
+                                @else
+                                    <img src="{{asset('/asset/img/avatar-pr.png')}}" class="img-circle elevation-2" alt="User Image" style="width: 30px; height: 30px;">
+                                @endif
+                            @else
+                                <img src="{{asset('/asset/img/profile_users/'.Session::get('detail_user')->file_foto)}}" class="img-circle elevation-2" alt="User Image" style="width: 30px; height: 30px;">
+                            @endif
                         </a>
                         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
                             <span class="dropdown-item dropdown-header">{{isset(Auth::user()->name) ? Auth::user()->name : ''}}</span>
@@ -109,40 +117,145 @@
 
             <aside class="main-sidebar sidebar-light-teal elevation-4">
                 <a href="index3.html" class="brand-link">
-                    <img src="{{asset('/asset/img/emr.png')}}" alt="Logo" class="brand-image" style="opacity: .8; margin-top: 2px;">
-                    <span class="brand-text font-weight-light">EMR BELA</span>
+                    <img src="{{asset('/asset/img/LOGO-RSFM.png')}}" alt="Logo" class="brand-image" style="opacity: .8; margin-top: 2px;">
+                    <span class="brand-text font-weight-light"><b>Fatima</b></span><span class="brand-text font-weight-light" style="font-size: 16px;"> Medical Record</span>
                 </a>
 
                 <div class="sidebar">
                     <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                         <div class="image">
-                            <img src="{{asset('/storage/foto_profil/'.Session::get('detail_user')->file_foto)}}" class="img-circle elevation-2" alt="User Image">
+                            @if(Session::get('detail_user')->file_foto == null)
+                                @if(Session::get('detail_user')->jenis_kelamin == 'L')
+                                    <img src="{{asset('/asset/img/avatar-lk.png')}}" class="img-circle elevation-2" alt="User Image">
+                                @else
+                                    <img src="{{asset('/asset/img/avatar-pr.png')}}" class="img-circle elevation-2" alt="User Image">
+                                @endif
+                            @else
+                                <img src="{{asset('/asset/img/profile_users/'.Session::get('detail_user')->file_foto)}}" class="img-circle elevation-2" alt="User Image">
+                            @endif
                         </div>
                         <div class="info">
-                            <a href="#" class="d-block">{{Session::get('detail_user')->nama_lengkap}}</a>
+                            <a href="/users/detail/{{Auth::user()->id}}" class="d-block">{{Session::get('detail_user')->nama_lengkap}}</a>
                         </div>
                     </div>
 
                     <nav class="mt-2">
                         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                            {{-- <li class="nav-item menu-open">
-                                <a href="#" class="nav-link active">
-                                    <i class="nav-icon fas fa-tachometer-alt"></i>
-                                    <p>
-                                        Dashboard
-                                        <i class="right fas fa-angle-left"></i>
-                                    </p>
+                            <li class="nav-item">
+                                <a href="/" class="nav-link" id="dashboard">
+                                <i class="nav-icon fas fa-th"></i>
+                                <p>Dashboard</p>
                                 </a>
-                                <ul class="nav nav-treeview">
+                            </li>
+                            @if(in_array(Session::get('role'), ['super-admin', 'admin', 'dokter', 'perawat']))
+                                <li class="nav-header emr-sub-menu menu-open" id="li-rawat-jalan">Rawat Jalan</li>
+                                <li class="nav-item">
+                                    <a href="/rawat-jalan/pendaftaran" class="nav-link" id="pendaftaran">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Pendaftaran</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/antre-poli" class="nav-link" id="antre-poli">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Antrean Poliklinik</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/riwayat-perawatan" class="nav-link" id="riwayat-perawatan">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Riwayat Perawatan</p>
+                                    </a>
+                                </li>
+                            @endif
+                            @if(in_array(Session::get('role'), ['super-admin', 'admin', 'dokter', 'perawat']))
+                                <li class="nav-header emr-sub-menu" id="li-pasien">Pasien</li>
+                                <li class="nav-item">
+                                    <a href="/data-pasien" class="nav-link" id="data-pasien">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Data Pasien</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/rm-pasien" class="nav-link" id="rekam-medis-pasien">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Rekam Medik Pasien</p>
+                                    </a>
+                                </li>
+                            @endif
+                            @if(in_array(Session::get('role'), ['super-admin', 'admin', 'dokter']))
+                                <li class="nav-header emr-sub-menu" id="li-poliklinik">Poliklinik</li>
+                                @if(in_array(Session::get('role'), ['super-admin', 'admin']))
                                     <li class="nav-item">
-                                        <a href="./index.html" class="nav-link active">
-                                            <i class="far fa-circle nav-icon"></i>
-                                            <p>Dashboard v1</p>
+                                        <a href="/data-poliklinik" class="nav-link" id="data-poliklinik">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Data Poliklinik</p>
                                         </a>
                                     </li>
-                                </ul>
-                            </li> --}}
-                            {{-- return from appserviceprovider --}}
+                                @endif
+                                <li class="nav-item">
+                                    <a href="/data-dokter-poli" class="nav-link" id="data-dokter-poli">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Data Dokter Poliklinik</p>
+                                    </a>
+                                </li>
+                            @endif
+                            @if(in_array(Session::get('role'), ['super-admin', 'admin', 'apoteker']))
+                                <li class="nav-header emr-sub-menu" id="li-farmasi">Farmasi</li>
+                                @if(in_array(Session::get('role'), ['super-admin', 'apoteker']))
+                                    <li class="nav-item">
+                                        <a href="/resep-obat" class="nav-link" id="resep-obat">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Resep Obat</p>
+                                        </a>
+                                    </li>
+                                @endif
+                                <li class="nav-item">
+                                    <a href="/data-obat" class="nav-link" id="data-obat">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Data Obat</p>
+                                    </a>
+                                </li>
+                            @endif
+                            @if(in_array(Session::get('role'), ['super-admin', 'kasir']))
+                                <li class="nav-header emr-sub-menu" id="li-kasir">Kasir</li>
+                                <li class="nav-item">
+                                    <a href="/pembayaran-pasien" class="nav-link" id="pembayaran-pasien">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Pembayaran Pasien</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/tagihan-pasien/draft" class="nav-link" id="tagihan-pasien-draft">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Tagihan Pasien (Draft)</p>
+                                    </a>
+                                </li>
+                            @endif
+                            @if(in_array(Session::get('role'), ['super-admin', 'admin']))
+                                <li class="nav-header emr-sub-menu" id="li-asuransi">Asuransi</li>
+                                <li class="nav-item">
+                                    <a href="/asuransi" class="nav-link" id="asuransi">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Data Asuransi</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/pasien-asuransi" class="nav-link" id="pasien-asuransi">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Data Pasien Asuransi</p>
+                                    </a>
+                                </li>
+                                <li class="nav-header emr-sub-menu" id="li-users">Users</li>
+                                <li class="nav-item">
+                                    <a href="/users" class="nav-link" id="sub-user">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Data Users</p>
+                                    </a>
+                                </li>
+                            @endif
+                        </ul>
+                        {{-- <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                             @if (isset($menu))
                                 @foreach ($menu as $item)
                                     @if (isset($item->sub_menu))
@@ -169,7 +282,7 @@
                                     @endif
                                 @endforeach
                             @endif
-                        </ul>
+                        </ul> --}}
                     </nav>
                 </div>
             </aside>
@@ -183,7 +296,7 @@
                             </div>
                             {{-- <div class="col-sm-6">
                                 <ol class="breadcrumb float-sm-right">
-                                    <li class="breadcrumb-item"><button onclick="history.back()">Kembali</button></li>
+                                    <li class="breadcrumb-item"><button class="btn" onclick="history.back()">Kembali</button></li>
                                 </ol>
                             </div> --}}
                         </div>

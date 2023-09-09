@@ -36,6 +36,7 @@ class AuthController extends Controller
                 ]);
                 $detail_user = DB::table('detail_user')->where('user_id', $user->id)->first();
                 session([
+                    'role' => $user->role,
                     'detail_user' => $detail_user,
                 ]);
                 return redirect('')->with('success', 'Login success');

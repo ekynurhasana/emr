@@ -51,13 +51,20 @@ class KasirController extends Controller
         $tagihan = DB::table('data_tagihan_pasien')
             ->join('data_pasien', 'data_tagihan_pasien.pasien_id', '=', 'data_pasien.id')
             ->join('data_pendaftar_perawatan', 'data_tagihan_pasien.perawatan_id', '=', 'data_pendaftar_perawatan.id')
-            ->select('data_tagihan_pasien.*', 'data_pasien.nama_pasien', 'data_pendaftar_perawatan.no_pendaftaran', 'data_pendaftar_perawatan.tgl_periksa')
+            ->select('data_tagihan_pasien.*', 'data_pasien.nama_pasien', 'data_pendaftar_perawatan.id as pendaftaran_id','data_pendaftar_perawatan.no_pendaftaran',  'data_pendaftar_perawatan.tgl_periksa')
             ->where('data_tagihan_pasien.id', $id)
             ->first();
 
         $tagihan_line = DB::table('data_tagihan_pasien_line')
             ->where('tagihan_pasien_id', $id)
             ->get();
+        $erm = DB::table('data_rekam_medis')
+            ->where('pasien_id', $tagihan->pasien_id)
+            ->first();
+        $no_erm = null;
+        if ($erm) {
+            $no_erm = $erm->no_erm;
+        }
         $title = 'Detail Pembayaran Pasien (' . $tagihan->no_tagihan . ')';
         $sub_menu_slug = 'pembayaran-pasien';
         if ($tagihan->status == 'draft') {
@@ -134,8 +141,59 @@ class KasirController extends Controller
             'total_asuransi' => $total_asuransi,
             'total_tagihan' => $total_tagihan,
             'asuransi' => $asuransi,
+            'no_erm' => $no_erm,
         ];
         return view('kasir.detail_tagihan', $data);
+    }
+
+    public function tambah_line(Request $request)
+    {
+        $request->validate([
+            'jenis_tagihan' => 'required',
+            'detail_tagihan' => 'required',
+            'harga' => 'required|numeric|min:1',
+            'jumlah' => 'required|numeric|min:1',
+        ], [
+            'jenis_tagihan.required' => 'Jenis tagihan harus diisi',
+            'detail_tagihan.required' => 'Detail tagihan harus diisi',
+            'harga.required' => 'Harga harus diisi',
+            'harga.numeric' => 'Harga harus berupa angka',
+            'harga.min' => 'Harga minimal 1',
+            'jumlah.required' => 'Jumlah harus diisi',
+            'jumlah.numeric' => 'Jumlah harus berupa angka',
+            'jumlah.min' => 'Jumlah minimal 1',
+        ]);
+        $jenis_tagihan = $request->jenis_tagihan;
+        $detail_tagihan = $request->detail_tagihan;
+        $harga = str_replace('.', '', $request->harga);
+        $jumlah = $request->jumlah;
+        $total = $harga * $jumlah;
+        $tagihan_id = $request->id_tagihan;
+        $data = [
+            'jenis_tagihan' => $jenis_tagihan,
+            'nama_tagihan' => $detail_tagihan,
+            'harga' => $harga,
+            'qty' => $jumlah,
+            'total' => $total,
+            'tagihan_pasien_id' => $tagihan_id,
+        ];
+        try {
+            $create = DB::table('data_tagihan_pasien_line')->insert($data);
+            return redirect()->back()->with('success', 'Data berhasil ditambahkan');
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('error', 'Data gagal ditambahkan ' . $th->getMessage());
+        }
+    }
+
+    public function delete_line(Request $request)
+    {
+        $id = $request->id_tagihan_line;
+        try {
+            DB::table('data_tagihan_pasien_line')->where('id', $id)->delete();
+            return redirect()->back()->with('success', 'Data berhasil dihapus');
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('error', 'Data gagal dihapus ' . $th->getMessage());
+        }
     }
 
     public function change_state(Request $request){

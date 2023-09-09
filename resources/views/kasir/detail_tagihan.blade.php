@@ -7,12 +7,21 @@
 @section('content')
 <div class="row">
     <div class="col-sm-12 col-md-6 col-lg-6">
+        <a href="{{url('/rawat-jalan/detail/'.$data->pendaftaran_id)}}" class="btn btn-info">
+            Detail Perawatan
+        </a>
+        @if($no_erm != null)
+            <a href="{{url('/rm-pasien/detail/'.$no_erm)}}" class="btn btn-info">
+                Detail Rekam Medik
+            </a>
+        @endif
     </div>
     <div class="col-sm-12 col-md-6 col-lg-6">
         <div class="status-bar">
             <span class="status-bar-item {{$data->status == 'draft' ? 'selected' : ''}}">Baru</span>
             <span class="status-bar-item {{$data->status == 'pending' ? 'selected' : ''}}">Menunggu Pembayaran</span>
             <span class="status-bar-item {{$data->status == 'terbayar' ? 'selected' : ''}}">Terbayar</span>
+            <span class="status-bar-item {{$data->status == 'batal' ? 'selected' : ''}}">Batal</span>
         </div>
     </div>
 </div>
@@ -179,6 +188,7 @@
         <div class="modal-dialog modal-lg" role="document">
             <form  method="POST" action="/tagihan/tambah-line">
                 @csrf
+                <input type="hidden" name="id_tagihan" value="{{$data->id}}">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h4 class="modal-title">Tambah Tagihan</h4>
@@ -316,6 +326,9 @@
         $('.harga_class').each(function(){
             $(this).html('Rp'+formatRupiah($(this).html()));
         });
+    });
+    $('#harga').on('keyup', function(){
+        $(this).val(formatRupiah($(this).val()));
     });
     $(document).ready(function(){
         var total_tagihan = $('#total-tagihan').text();

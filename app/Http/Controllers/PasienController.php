@@ -62,7 +62,7 @@ class PasienController extends Controller
                 $id_pasien = $create->id;
                 return redirect('data-pasien/detail/' . $id_pasien)->with('success', 'Data berhasil ditambahkan');
             } catch (\Throwable $th) {
-                return redirect('data-pasien')->with('error', 'Data gagal ditambahkan ' . $th);
+                return redirect('data-pasien')->with('error', 'Data gagal ditambahkan ' . $th->getMessage());
             }
         }
     }
@@ -135,7 +135,7 @@ class PasienController extends Controller
                 DB::table('data_pasien')->where('id', $request->id)->update($data);
                 return redirect('data-pasien/detail/' . $request->id)->with('success', 'Data pasien berhasil diubah');
             } catch (\Throwable $th) {
-                return redirect('data-pasien/detail/' . $request->id)->with('error', 'Data pasien gagal diubah ' . $th);
+                return redirect('data-pasien/detail/' . $request->id)->with('error', 'Data pasien gagal diubah ' . $th->getMessage());
             }
         }
 
@@ -143,13 +143,19 @@ class PasienController extends Controller
 
     public function delete(Request $request)
     {
+        // data_pendaftar_perawatan -> data_rekam_medis -> data_rekam_medis_pasien
         if ($request->isMethod('delete')) {
             $id = $request->id_pasien;
             try {
                 DB::table('data_pasien')->where('id', $id)->delete();
                 return redirect('data-pasien')->with('success', 'Data berhasil dihapus');
             } catch (\Throwable $th) {
-                return redirect('data-pasien')->with('error', 'Data gagal dihapus ' . $th);
+                $message = $th->getMessage();
+                if (strpos($message, 'foreign key constraint fails')) {
+                    return redirect('data-pasien')->with('error', 'Data gagal dihapus! Data pasien masih digunakan di data lainnya');
+                } else {
+                    return redirect('data-pasien')->with('error', 'Data gagal dihapus! ' . $message);
+                }
             }
         }
     }

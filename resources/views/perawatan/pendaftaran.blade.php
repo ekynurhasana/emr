@@ -8,11 +8,13 @@
 {{-- <div --}}
 @if($sub_menu_slug == 'pendaftaran')
 <div class="row">
-    <div class="col-md-4 col-sm-12 col-xs-12">
-        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modal-pendaftaran">
-            Tambah Pendaftaran Baru
-        </button>
-    </div>
+    @if(in_array(Session::get('role'), ['super-admin', 'admin']))
+        <div class="col-md-4 col-sm-12 col-xs-12">
+            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modal-pendaftaran">
+                Tambah Pendaftaran Baru
+            </button>
+        </div>
+    @endif
 </div><br>
 @endif
 <div class="row">
@@ -41,7 +43,7 @@
                             @if($sub_menu_slug == 'antre-poli' || $sub_menu_slug == 'riwayat-perawatan')
                             <th class="text-center">Status</th>
                             @endif
-                            <th class="text-center" style="width: 10%">Action</th>
+                            <th class="text-center" style="width: 10%"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -75,9 +77,11 @@
                                     <a href="{{url('/rawat-jalan/detail/'.$daftar->id)}}" class="btn btn-primary btn-sm">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#modal-hapus" data-id="{{$daftar->id}}" data-nama="{{$daftar->nama_pasien}}">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
+                                    @if(in_array(Session::get('role'), ['super-admin', 'admin']))
+                                        <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#modal-hapus" data-id="{{$daftar->id}}" data-nama="{{$daftar->nama_pasien}}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach
@@ -88,7 +92,7 @@
         </div>
     </div>
 </div>
-
+@if(in_array(Session::get('role'), ['super-admin', 'admin']))
 <div class="modal fade" id="modal-pendaftaran">
     <div class="modal-dialog modal-lg">
         <form  method="POST" action="/rawat-jalan/pendaftaran/tambah" id="form-pendaftaran-rawat-jalan">
@@ -205,6 +209,7 @@
         </div>
     </div>
 </div>
+@endif
 
 @endsection
 @section('script')

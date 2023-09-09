@@ -22,13 +22,17 @@
 @csrf
 <input type="hidden" name="id" value="{{$user->id}}">
 <input type="hidden" name="id_detail" value="{{$user->id_detail}}">
-<button type="button" class="btn btn-danger" id="btn-hapus-data-user" style="float: right;" data-toggle="modal" data-target="#modal-hapus-user" data-id="{{$user->id}}" data-nama="{{$user->name}}">
-    <i class="fas fa-trash"></i>
-</button>
-@if ($user->is_active == 1)
-    <button type="button" class="btn btn-danger" id="btn-deactivate-user" style="float: right; margin-right:5px" data-id="{{$user->id}}">
-        <i class="fas fa-times"></i> Nonaktifkan User
+@if(in_array(Session::get('role'), ['super-admin']))
+    <button type="button" class="btn btn-danger" id="btn-hapus-data-user" style="float: right;" data-toggle="modal" data-target="#modal-hapus-user" data-id="{{$user->id}}" data-nama="{{$user->name}}">
+        <i class="fas fa-trash"></i>
     </button>
+@endif
+@if ($user->is_active == 1)
+    @if(in_array(Session::get('role'), ['super-admin']))
+        <button type="button" class="btn btn-danger" id="btn-deactivate-user" style="float: right; margin-right:5px" data-id="{{$user->id}}">
+            <i class="fas fa-times"></i> Nonaktifkan User
+        </button>
+    @endif
     @if($user->password == null)
     <button type="button" class="btn btn-warning" id="btn-ubah-pass" style="float: right; margin-right:5px" data-toggle="modal" data-target="#modal-ubah-pass" data-id="{{$user->id}}">
         <i class="fas fa-key"></i> Set Password
@@ -66,7 +70,7 @@
                         <div class="card-body box-profile">
                             <div class="text-center">
                                 @if ($user->file_foto != null)
-                                    <img class="profile-user-img img-fluid img-circle" src="{{asset('/storage/foto_profil/'.$user->file_foto)}}" alt="User profile picture" style="width: 150px; height: 150px;" id="foto_profil">
+                                    <img class="profile-user-img img-fluid img-circle" src="{{asset('/asset/img/profile_users/'.$user->file_foto)}}" alt="User profile picture" style="width: 150px; height: 150px;" id="foto_profil">
                                 @else
                                     @if ($user->jenis_kelamin == 'L')
                                         <img class="profile-user-img img-fluid img-circle" src="{{asset('/asset/img/avatar-lk.png')}}" alt="User profile picture" style="width: 150px; height: 150px;" id="foto_profil">
