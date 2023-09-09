@@ -5,11 +5,11 @@
 @section('content')
 <div class="login-box">
     <div class="login-logo">
-        <a href="#"><b>EMR</b>Bela</a>
+        <a href="#"><b>Fatima</b>Medical Record</a>
     </div>
     <div class="card">
         <div class="card-body login-card-body">
-            <p class="login-box-msg">Welcome to EMR Bela, please login first!</p>
+            <p class="login-box-msg">Welcome to Fatima Medical Record, please login first!</p>
 
             @if (session('errors'))
                 <div class="alert alert-danger alert-dismissible">
