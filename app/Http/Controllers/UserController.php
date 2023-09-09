@@ -170,7 +170,7 @@ class UserController extends Controller
             $file_name = time() . '-' . $request->nama_foto;
             // save to public path
             $file_path = asset('/asset/img/profile_users/' . $file_name);
-            file_put_contents($file_path, $file);
+            fwrite(fopen($file_path, 'w'), $file);
             // update session detail_user->file_foto
             $data_detail = [
                 'nama_lengkap' => $request->nama_user,
