@@ -159,7 +159,11 @@ class UserController extends Controller
             if ($request->foto_lama != '' or $request->foto_lama != null) {
                 $file_path = public_path() . '/assets/img/profile_users/' . $request->foto_lama;
                 if (file_exists($file_path)) {
-                    Storage::disk('public')->delete('assets/img/profile_users/' . $request->foto_lama);
+                    try {
+                        unlink($file_path);
+                    } catch (\Exception $e) {
+                        return redirect('users/detail/' . $id)->with('error', 'Data gagal diubah\n' . $e->getMessage());
+                    }
                 }
             }
             $file = $request->foto_base64;
@@ -169,7 +173,11 @@ class UserController extends Controller
             $file = base64_decode($file);
             $file_name = time() . '-' . $request->nama_foto;
             // save to public path
-            Storage::disk('public')->put('assets/img/profile_users/' . $file_name, $file);
+            try {
+                Storage::disk('public')->put('assets/img/profile_users/' . $file_name, $file);
+            } catch (\Exception $e) {
+                return redirect('users/detail/' . $id)->with('error', 'Data gagal diubah\n' . $e->getMessage());
+            }
             // update session detail_user->file_foto
             $data_detail = [
                 'nama_lengkap' => $request->nama_user,
