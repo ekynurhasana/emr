@@ -352,7 +352,7 @@
         var id = button.data('id')
         var nama = button.data('nama')
         var modal = $(this)
-        modal.find('.modal-body #modal_body_delete').text('Apakah anda yakin ingin menghapus pasien atas nama ' + nama + '?<br> Apabila pasien dihapus, maka semua data yang berkaitan dengan pasien ini tidak akan menampilkan data pasien ini lagi.')
+        modal.find('.modal-body #modal_body_delete').text('Apakah anda yakin ingin menghapus pasien atas nama ' + nama + '?<br>Apabila pasien dihapus, maka semua data yang berkaitan dengan pasien ini tidak akan menampilkan detail dari data pasien ini.')
         $('#id_pasien').val(id)
     });
 </script>
