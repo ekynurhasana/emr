@@ -10,28 +10,34 @@
         <form method="POST" action="/data-dokter-poli/update" id="form_edit_data_dokter_poli">
         @csrf
         <input type="hidden" name="id" value="{{$data->id}}">
-        <button type="button" class="btn btn-danger" id="btn-hapus-data" data-toggle="modal" data-target="#modal-hapus-data" data-id="{{$data->id}}" data-poli="{{$data->nama_poli}}" data-dokter="{{$data->nama_dokter}}">
-            <i class="fas fa-trash"></i>
-        </button>
-        @if($data->status == 'tutup' && $is_buka)
-            <button type="button" class="btn btn-success" id="btn-buka-jadwal-praktek" onclick="updateStatusPraktek()">
-                Buka Praktek
+        @if(in_array(Auth::user()->role, ['super-admin', 'admin']))
+            <button type="button" class="btn btn-danger" id="btn-hapus-data" data-toggle="modal" data-target="#modal-hapus-data" data-id="{{$data->id}}" data-poli="{{$data->nama_poli}}" data-dokter="{{$data->nama_dokter}}">
+                <i class="fas fa-trash"></i>
             </button>
         @endif
-        @if ($data->status == 'buka')
-            <button type="button" class="btn btn-danger" id="btn-tutup-jadwal-praktek" onclick="updateStatusPraktek()">
-                Tutup Praktek
+        @if(Auth::user()->id == $data->dokter_id)
+            @if($data->status == 'tutup' && $is_buka)
+                <button type="button" class="btn btn-success" id="btn-buka-jadwal-praktek" onclick="updateStatusPraktek()">
+                    Buka Praktek
+                </button>
+            @endif
+            @if ($data->status == 'buka')
+                <button type="button" class="btn btn-danger" id="btn-tutup-jadwal-praktek" onclick="updateStatusPraktek()">
+                    Tutup Praktek
+                </button>
+            @endif
+        @endif
+        @if(in_array(Auth::user()->role, ['super-admin', 'admin']))
+            <button type="button" class="btn btn-info" id="btn-edit-data">
+                Edit Data Dokter Poliklinik
+            </button>
+            <button type="button" class="btn btn-danger" id="btn-cancel-edit-data" style="display: none;">
+                Cancel
+            </button>
+            <button type="button" class="btn btn-success" id="btn-save-data" style="display: none;" onclick="simpanDataDokterPoli()">
+                Simpan Data Dokter Poliklinik
             </button>
         @endif
-        <button type="button" class="btn btn-info" id="btn-edit-data">
-            Edit Data Dokter Poliklinik
-        </button>
-        <button type="button" class="btn btn-danger" id="btn-cancel-edit-data" style="display: none;">
-            Cancel
-        </button>
-        <button type="button" class="btn btn-success" id="btn-save-data" style="display: none;" onclick="simpanDataDokterPoli()">
-            Simpan Data Dokter Poliklinik
-        </button>
         <br><br>
         <div class="card card-info card-outline">
             <div class="card-body">
@@ -93,9 +99,11 @@
             <div class="card-body">
                 <div class="tab-content" id="emr-tabs-tabContent">
                     <div class="tab-pane fade show active" id="emr-tabs-jadwal-praktek" role="tabpanel" aria-labelledby="emr-tabs-jadwal-praktek-tab">
-                        <button type="button" class="btn btn-primary" id="btn-tambah-jadwal-praktek" data-toggle="modal" data-target="#modal-tambah-jadwal-praktek" style="float: right;">
-                            Tambah Jadwal Praktek
-                        </button><br><br>
+                        @if(in_array(Auth::user()->role, ['super-admin', 'admin']))
+                            <button type="button" class="btn btn-primary" id="btn-tambah-jadwal-praktek" data-toggle="modal" data-target="#modal-tambah-jadwal-praktek" style="float: right;">
+                                Tambah Jadwal Praktek
+                            </button><br><br>
+                        @endif
                         <div>
                             <table id="tabel_dokter_poli" class="table table-bordered table-hover">
                                 <thead>
@@ -305,6 +313,32 @@
 <script src="{{asset('/adminlte/plugins/datatables-buttons/js/buttons.html5.min.js')}}"></script>
 <script src="{{asset('/adminlte/plugins/datatables-buttons/js/buttons.print.min.js')}}"></script>
 <script src="{{asset('/adminlte/plugins/datatables-buttons/js/buttons.colVis.min.js')}}"></script>
+@if(Auth::user()->id == $data->dokter_id)
+<script>
+    $(document).ready(function(){
+        $('#biaya_tambahan').val(formatRupiah($('#biaya_tambahan').val()));
+        @if ($is_buka && $data->status == 'tutup')
+            Swal.fire({
+                title: 'Waktunya Buka Praktek',
+                text: "Sekarang merupakan waktu praktek dokter, apakah anda ingin membuka praktek?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Buka Praktek',
+                cancelButtonText: 'Tidak'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $('#status').val('buka');
+                    $('#btn-buka-jadwal-praktek').html('<i class="fas fa-spinner fa-spin"></i> Buka Praktek');
+                    $('#btn-buka-jadwal-praktek').attr('disabled', true);
+                    $('#form_status_praktek').submit();
+                }
+            })
+        @endif
+    });
+</script>
+@endif
 <script>
     $('#btn-edit-data').click(function(){
         $('#btn-edit-data').hide();
@@ -334,29 +368,6 @@
         $("#biaya_tambahan").keyup(function(e){
             $(this).val(formatRupiah($(this).val()));
         });
-    });
-
-    $(document).ready(function(){
-        $('#biaya_tambahan').val(formatRupiah($('#biaya_tambahan').val()));
-        @if ($is_buka && $data->status == 'tutup')
-            Swal.fire({
-                title: 'Waktunya Buka Praktek',
-                text: "Sekarang merupakan waktu praktek dokter, apakah anda ingin membuka praktek?",
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Buka Praktek',
-                cancelButtonText: 'Tidak'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $('#status').val('buka');
-                    $('#btn-buka-jadwal-praktek').html('<i class="fas fa-spinner fa-spin"></i> Buka Praktek');
-                    $('#btn-buka-jadwal-praktek').attr('disabled', true);
-                    $('#form_status_praktek').submit();
-                }
-            })
-        @endif
     });
     function simpanDataDokterPoli(){
         Swal.fire({

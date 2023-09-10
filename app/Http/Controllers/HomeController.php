@@ -9,26 +9,26 @@ class HomeController extends Controller
     public function index()
     {
         $data_pendaftar_perawatan_today = DB::table('data_pendaftar_perawatan')
-            ->whereDate('created_at', date('Y-m-d'))
+            ->whereDate('tgl_periksa', date('Y-m-d'))
             ->count();
         $data_pendaftar_perawatan_this_month = DB::table('data_pendaftar_perawatan')
-            ->whereMonth('created_at', date('m'))
+            ->whereMonth('tgl_periksa', date('m'))
             ->count();
         $data_pendaftar_perawatan_this_year = DB::table('data_pendaftar_perawatan')
-            ->whereYear('created_at', date('Y'))
+            ->whereYear('tgl_periksa', date('Y'))
             ->count();
         $data_pendaftar_perawatan = DB::table('data_pendaftar_perawatan')
             ->count();
         $data_pendaftar_perawatan_baru_today = DB::table('data_pendaftar_perawatan')
-            ->whereDate('created_at', date('Y-m-d'))
+            ->whereDate('tgl_periksa', date('Y-m-d'))
             ->where('status', 'baru')
             ->count();
         $data_pendaftar_perawatan_on_antre_today = DB::table('data_pendaftar_perawatan')
-            ->whereDate('created_at', date('Y-m-d'))
+            ->whereDate('tgl_periksa', date('Y-m-d'))
             ->where('status', 'antre')
             ->count();
         $data_pendaftar_perawatan_selesai_today = DB::table('data_pendaftar_perawatan')
-            ->whereDate('created_at', date('Y-m-d'))
+            ->whereDate('tgl_periksa', date('Y-m-d'))
             ->where('status', 'selesai')
             ->count();
         $data = [

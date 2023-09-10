@@ -691,7 +691,7 @@
             var id = button.data('id')
             var nama = button.data('nama')
             var modal = $(this)
-            modal.find('.modal-body #modal_body_delete').text('Apakah anda yakin ingin menghapus pendafataran atas nama '+nama+'?')
+            modal.find('.modal-body #modal_body_delete').text('Apakah anda yakin ingin menghapus pendafataran atas nama '+nama+'?<br/>Apabila anda menghapus data ini, maka detail data pendaftaran disetiap data lainnya akan hilang!')
             $('#id').val(id)
         });
     });

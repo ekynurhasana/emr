@@ -5,19 +5,21 @@
 <form method="POST" action="/data-obat/edit" id="form_edit_data_obat">
 @csrf
 <input type="hidden" name="id" value="{{$data->id}}">
-<button type="button" class="btn btn-danger" id="btn-hapus-data-obat" data-toggle="modal" data-target="#modal-hapus-data-obat" data-id="{{$data->id}}" data-nama="{{$data->nama_obat}}">
-    <i class="fas fa-trash"></i>
-</button>
-<button type="button" class="btn btn-info" id="btn-edit-data-obat">
-    Edit Data Obat
-</button>
-<button type="button" class="btn btn-danger" id="btn-cancel-edit-data-obat" style="display: none;">
-    Cancel
-</button>
-<button type="button" class="btn btn-success" id="btn-save-data-obat" style="display: none;" onclick="simpanDataObat()">
-    Simpan Data Obat
-</button>
-<br><br>
+@if(in_array(Auth::user()->role, ['superadmin', 'admin', 'apoteker']))
+    <button type="button" class="btn btn-danger" id="btn-hapus-data-obat" data-toggle="modal" data-target="#modal-hapus-data-obat" data-id="{{$data->id}}" data-nama="{{$data->nama_obat}}">
+        <i class="fas fa-trash"></i>
+    </button>
+    <button type="button" class="btn btn-info" id="btn-edit-data-obat">
+        Edit Data Obat
+    </button>
+    <button type="button" class="btn btn-danger" id="btn-cancel-edit-data-obat" style="display: none;">
+        Cancel
+    </button>
+    <button type="button" class="btn btn-success" id="btn-save-data-obat" style="display: none;" onclick="simpanDataObat()">
+        Simpan Data Obat
+    </button>
+    <br><br>
+@endif
 <div class="row">
     <div class="col-sm-12 col-md-12 col-lg-12">
         <div class="card card-info card-outline">

@@ -146,6 +146,103 @@ class PasienController extends Controller
         // data_pendaftar_perawatan -> data_rekam_medis -> data_rekam_medis_pasien
         if ($request->isMethod('delete')) {
             $id = $request->id_pasien;
+            $antrean = DB::table('conf_antrean_rawat_jalan')->where('pasien_id', $id)->get();
+            if (count($antrean) > 0) {
+                foreach ($antrean as $key => $value) {
+                    try {
+                        DB::table('conf_antrean_rawat_jalan')->where('id', $value->id)->update(['pasien_id' => null]);
+                    } catch (\Throwable $th) {
+                        $message = $th->getMessage();
+                        return redirect()->back()->with('error', 'Data gagal diubah! ' . $message);
+                    }
+                }
+            }
+            $tagihan = DB::table('data_tagihan_pasien')->where('pasien_id', $id)->get();
+            if (count($tagihan) > 0) {
+                foreach ($tagihan as $key => $value) {
+                    if(in_array($value->status, ['draft', 'pending'])) {
+                        return redirect()->back()->with('error', 'Data gagal dihapus! Pasien masih memiliki tagihan yang belum lunas');
+                    }
+                    try {
+                        DB::table('data_tagihan_pasien')->where('id', $value->id)->update(['pasien_id' => null]);
+                    } catch (\Throwable $th) {
+                        $message = $th->getMessage();
+                        return redirect()->back()->with('error', 'Data gagal diupdate! ' . $message);
+                    }
+                }
+            }
+            $resep = DB::table('data_resep_obat_pasien')->where('pasien_id', $id)->get();
+            if (count($resep) > 0) {
+                foreach ($resep as $key => $value) {
+                    if(in_array($value->status, ['draft', 'diproses'])) {
+                        return redirect()->back()->with('error', 'Data gagal dihapus! Pasien masih memiliki resep yang belum selesai');
+                    }
+                    try {
+                        DB::table('data_resep_obat_pasien')->where('id', $value->id)->update(['pasien_id' => null]);
+                    } catch (\Throwable $th) {
+                        $message = $th->getMessage();
+                        return redirect()->back()->with('error', 'Data gagal diupdate! ' . $message);
+                    }
+                }
+            }
+            $pendafataran = DB::table('data_pendaftar_perawatan')->where('pasien_id', $id)->get();
+            if (count($pendafataran) > 0) {
+                foreach ($pendafataran as $key => $value) {
+                    if(in_array($value->status, ['baru', 'antri', 'diperiksa'])) {
+                        return redirect()->back()->with('error', 'Data gagal dihapus! Pasien masih memiliki pendaftaran yang belum selesai. Silahkan batalkan pendaftaran terlebih dahulu');
+                    }
+                    try {
+                        DB::table('data_pendaftar_perawatan')->where('id', $value->id)->update(['pasien_id' => null]);
+                    } catch (\Throwable $th) {
+                        $message = $th->getMessage();
+                        return redirect()->back()->with('error', 'Data gagal diupdate! ' . $message);
+                    }
+                }
+            }
+            $asuransi_pasien = DB::table('data_asuransi_pasien')->where('pasien_id', $id)->get();
+            if (count($asuransi_pasien) > 0) {
+                foreach ($asuransi_pasien as $key => $value) {
+                    $asuransi_pasien_line = DB::table('data_asuransi_pasien_tanggungan')->where('asuransi_pasien_id', $value->id)->get();
+                    if (count($asuransi_pasien_line) > 0) {
+                        foreach ($asuransi_pasien_line as $key => $value) {
+                            try {
+                                DB::table('data_asuransi_pasien_tanggungan')->where('id', $value->id)->delete();
+                            } catch (\Throwable $th) {
+                                $message = $th->getMessage();
+                                return redirect()->back()->with('error', 'Data gagal dihapus! ' . $message);
+                            }
+                        }
+                    }
+                    try {
+                        DB::table('data_asuransi_pasien')->where('id', $value->id)->delete();
+                    } catch (\Throwable $th) {
+                        $message = $th->getMessage();
+                        return redirect()->back()->with('error', 'Data gagal dihapus! ' . $message);
+                    }
+                }
+            }
+            $rm = DB::table('data_rekam_medis')->where('pasien_id', $id)->get();
+            if (count($rm) > 0) {
+                foreach ($rm as $key => $value) {
+                    $rm_line = DB::table('data_rekam_medis_pasien')->where('no_rekam_medis', $value->no_erm)->get();
+                    if (count($rm_line) > 0) {
+                        foreach ($rm_line as $key => $value) {
+                            try {
+                                DB::table('data_rekam_medis_pasien')->where('id', $value->id)->delete();
+                            } catch (\Throwable $th) {
+                                $message = $th->getMessage();
+                                return redirect()->back()->with('error', 'Data gagal dihapus! ' . $message);
+                            }
+                        }
+                    }
+                    try {
+                        DB::table('data_rekam_medis')->where('id', $value->id)->delete();
+                    } catch (\Throwable $th) {
+                        $message = $th->getMessage();
+                        return redirect()->back()->with('error', 'Data gagal dihapus! ' . $message);
+                    }
+                }
+            }
             try {
                 DB::table('data_pasien')->where('id', $id)->delete();
                 return redirect('data-pasien')->with('success', 'Data berhasil dihapus');

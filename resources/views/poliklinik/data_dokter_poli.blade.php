@@ -9,7 +9,7 @@
 <div class="row">
     <div class="col-md-4 col-sm-12 col-xs-12">
         {{-- cek user role --}}
-        @if (Auth::user()->role == 'super-admin')
+        @if (in_array(Auth::user()->role, ['super-admin', 'admin']))
             <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modal-tambah-dokter-poli" id="btn-tambah-dokter-poli">
                 Tambah Jadwal Dokter
             </button>
@@ -52,7 +52,7 @@
                                 </td>
                                 <td class="text-center">
                                     <a href="{{url('/data-dokter-poli/detail/'.$dok_poli->id)}}" class="btn btn-primary btn-sm"><i class="fas fa-eye"></i> </a>
-                                    @if (Auth::user()->role == 'super-admin')
+                                    @if (in_array(Auth::user()->role, ['super-admin', 'admin']))
                                         <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#modal-hapus-dokter-poli" data-id="{{$dok_poli->id}}" data-poli="{{$dok_poli->nama_poli}}" data-dokter="{{$dok_poli->nama_dokter}}">
                                             <i class="fas fa-trash"></i>
                                         </button>

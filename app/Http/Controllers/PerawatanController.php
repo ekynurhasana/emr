@@ -24,6 +24,18 @@ class PerawatanController extends Controller
             ->select('data_pendaftar_perawatan.*', 'data_pasien.nama_pasien as nama_pasien', 'data_poli.nama_poli as nama_poli', 'users.name as nama_dokter')
             ->orderBy('data_pendaftar_perawatan.tanggal_pendaftaran', 'desc')
             ->get();
+        if(Auth()->user()->role == 'dokter'){
+            $pendaftaran_pasien = DB::table('data_pendaftar_perawatan')
+                ->join('data_pasien', 'data_pendaftar_perawatan.pasien_id', '=', 'data_pasien.id')
+                ->join('data_poli', 'data_pendaftar_perawatan.poli_id', '=', 'data_poli.id')
+                ->join('data_dokter_poli', 'data_pendaftar_perawatan.dokter_poli_id', '=', 'data_dokter_poli.id')
+                ->join('users', 'data_pendaftar_perawatan.dokter_id', '=', 'users.id')
+                ->where('data_pendaftar_perawatan.status', '=', 'baru')
+                ->where('data_pendaftar_perawatan.dokter_id', '=', Auth()->user()->id)
+                ->select('data_pendaftar_perawatan.*', 'data_pasien.nama_pasien as nama_pasien', 'data_poli.nama_poli as nama_poli', 'users.name as nama_dokter')
+                ->orderBy('data_pendaftar_perawatan.tanggal_pendaftaran', 'desc')
+                ->get();
+        }
         $pasiens = DB::table('data_pasien')->get();
         $polis = DB::table('data_poli')->get();
         $data = [
@@ -579,6 +591,20 @@ class PerawatanController extends Controller
             ->select('data_pendaftar_perawatan.*', 'data_pasien.nama_pasien as nama_pasien', 'data_poli.nama_poli as nama_poli', 'users.name as nama_dokter', 'conf_antrean_rawat_jalan.no_antreaan as no_antrian')
             ->orderBy('data_pendaftar_perawatan.tanggal_pendaftaran', 'desc')
             ->get();
+        if(Auth()->user()->role == 'dokter'){
+            $pendaftaran_pasien = DB::table('data_pendaftar_perawatan')
+                ->where('data_pendaftar_perawatan.status', '=', 'antri')
+                ->orWhere('data_pendaftar_perawatan.status', '=', 'diperiksa')
+                ->join('data_pasien', 'data_pendaftar_perawatan.pasien_id', '=', 'data_pasien.id')
+                ->join('data_poli', 'data_pendaftar_perawatan.poli_id', '=', 'data_poli.id')
+                ->join('data_dokter_poli', 'data_pendaftar_perawatan.dokter_poli_id', '=', 'data_dokter_poli.id')
+                ->join('users', 'data_pendaftar_perawatan.dokter_id', '=', 'users.id')
+                ->join('conf_antrean_rawat_jalan', 'data_pendaftar_perawatan.id', '=', 'conf_antrean_rawat_jalan.pendaftaran_perawatan_id')
+                ->where('data_pendaftar_perawatan.dokter_id', Auth()->user()->id)
+                ->select('data_pendaftar_perawatan.*', 'data_pasien.nama_pasien as nama_pasien', 'data_poli.nama_poli as nama_poli', 'users.name as nama_dokter', 'conf_antrean_rawat_jalan.no_antreaan as no_antrian')
+                ->orderBy('data_pendaftar_perawatan.tanggal_pendaftaran', 'desc')
+                ->get();
+        }
         $pasiens = DB::table('data_pasien')->get();
         $polis = DB::table('data_poli')->get();
         $data = [
@@ -604,6 +630,19 @@ class PerawatanController extends Controller
             ->orderBy('data_pendaftar_perawatan.tgl_periksa', 'desc')
             ->select('data_pendaftar_perawatan.*', 'data_pasien.nama_pasien as nama_pasien', 'data_poli.nama_poli as nama_poli', 'users.name as nama_dokter')
             ->get();
+        if(Auth()->user()->role == 'dokter'){
+            $pendaftaran_pasien = DB::table('data_pendaftar_perawatan')
+                ->where('data_pendaftar_perawatan.status', '=', 'selesai')
+                ->orWhere('data_pendaftar_perawatan.status', '=', 'batal')
+                ->join('data_pasien', 'data_pendaftar_perawatan.pasien_id', '=', 'data_pasien.id')
+                ->join('data_poli', 'data_pendaftar_perawatan.poli_id', '=', 'data_poli.id')
+                ->join('data_dokter_poli', 'data_pendaftar_perawatan.dokter_poli_id', '=', 'data_dokter_poli.id')
+                ->join('users', 'data_pendaftar_perawatan.dokter_id', '=', 'users.id')
+                ->where('data_pendaftar_perawatan.dokter_id', Auth()->user()->id)
+                ->orderBy('data_pendaftar_perawatan.tgl_periksa', 'desc')
+                ->select('data_pendaftar_perawatan.*', 'data_pasien.nama_pasien as nama_pasien', 'data_poli.nama_poli as nama_poli', 'users.name as nama_dokter')
+                ->get();
+        }
         $pasiens = DB::table('data_pasien')->get();
         $polis = DB::table('data_poli')->get();
         $data = [
@@ -632,7 +671,7 @@ class PerawatanController extends Controller
                 try {
                     $update_antrean = DB::table('conf_antrean_rawat_jalan')->where('pendaftaran_perawatan_id', $id)->update(['status' => 'batal', 'pendaftaran_perawatan_id' => null]);
                 } catch (\Throwable $th) {
-                    return redirect()->back()->with('error', 'Data antrean gagal dihapus');
+                    return redirect()->back()->with('error', 'Data antrean gagal diupdate' . $th->getMessage());
                 }
             }
             $rm = DB::table('data_rekam_medis_pasien')->where('pendaftaran_id', $id)->first();
@@ -640,7 +679,7 @@ class PerawatanController extends Controller
                 try {
                     $update_rm = DB::table('data_rekam_medis_pasien')->where('pendaftaran_id', $id)->update(['pendaftaran_id' => null]);
                 } catch (\Throwable $th) {
-                    return redirect()->back()->with('error', 'Data rekam medis gagal dihapus');
+                    return redirect()->back()->with('error', 'Data rekam medis gagal diupdate' . $th->getMessage());
                 }
             }
             $resep = DB::table('data_resep_obat_pasien')->where('pendaftaran_id', $id)->first();
@@ -648,7 +687,7 @@ class PerawatanController extends Controller
                 try {
                     $update_resep = DB::table('data_resep_obat_pasien')->where('pendaftaran_id', $id)->update(['pendaftaran_id' => null, 'status' => 'batal']);
                 } catch (\Throwable $th) {
-                    return redirect()->back()->with('error', 'Data resep gagal dihapus');
+                    return redirect()->back()->with('error', 'Data resep gagal diupdate' . $th->getMessage());
                 }
             }
             $tagihan = DB::table('data_tagihan_pasien')->where('perawatan_id', $id)->first();
@@ -656,7 +695,7 @@ class PerawatanController extends Controller
                 try {
                     $update_tagihan = DB::table('data_tagihan_pasien')->where('perawatan_id', $id)->update(['perawatan_id' => null, 'status' => 'batal']);
                 } catch (\Throwable $th) {
-                    return redirect()->back()->with('error', 'Data tagihan gagal dihapus');
+                    return redirect()->back()->with('error', 'Data tagihan gagal diupdate' . $th->getMessage());
                 }
             }
             try {
