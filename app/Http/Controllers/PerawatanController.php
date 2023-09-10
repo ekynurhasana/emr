@@ -9,6 +9,7 @@ use App\Models\DataPendaftarPerawatanModel;
 use App\Models\DataTagihanModel;
 use App\Models\DataRekamMedisModel;
 use App\Models\DataResepObatPasienModel;
+use Illuminate\Support\Facades\Session;
 
 class PerawatanController extends Controller
 {
@@ -16,7 +17,7 @@ class PerawatanController extends Controller
     public function index()
     {
 
-        if(Auth()->user()->role == 'dokter'){
+        if(Session::get('role') == 'dokter'){
             $pendaftaran_pasien = DB::table('data_pendaftar_perawatan')
                 ->join('data_pasien', 'data_pendaftar_perawatan.pasien_id', '=', 'data_pasien.id')
                 ->join('data_poli', 'data_pendaftar_perawatan.poli_id', '=', 'data_poli.id')
@@ -582,7 +583,7 @@ class PerawatanController extends Controller
 
     public function get_antre_poli()
     {
-        if(Auth()->user()->role == 'dokter'){
+        if(Session::get('role') == 'dokter'){
             $pendaftaran_pasien = DB::table('data_pendaftar_perawatan')
                 ->where('data_pendaftar_perawatan.status', '=', 'antri')
                 ->orWhere('data_pendaftar_perawatan.status', '=', 'diperiksa')
@@ -633,7 +634,7 @@ class PerawatanController extends Controller
             ->orderBy('data_pendaftar_perawatan.tgl_periksa', 'desc')
             ->select('data_pendaftar_perawatan.*', 'data_pasien.nama_pasien as nama_pasien', 'data_poli.nama_poli as nama_poli', 'users.name as nama_dokter')
             ->get();
-        if(Auth()->user()->role == 'dokter'){
+        if(Session::get('role') == 'dokter'){
             $pendaftaran_pasien = DB::table('data_pendaftar_perawatan')
                 ->where('data_pendaftar_perawatan.status', '=', 'selesai')
                 ->orWhere('data_pendaftar_perawatan.status', '=', 'batal')
