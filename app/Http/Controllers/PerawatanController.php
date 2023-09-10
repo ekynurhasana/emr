@@ -9,7 +9,6 @@ use App\Models\DataPendaftarPerawatanModel;
 use App\Models\DataTagihanModel;
 use App\Models\DataRekamMedisModel;
 use App\Models\DataResepObatPasienModel;
-use Illuminate\Support\Facades\Session;
 
 class PerawatanController extends Controller
 {
@@ -17,7 +16,7 @@ class PerawatanController extends Controller
     public function index()
     {
 
-        if(Session::get('role') == 'dokter'){
+        if(session('role') == 'dokter'){
             $pendaftaran_pasien = DB::table('data_pendaftar_perawatan')
                 ->join('data_pasien', 'data_pendaftar_perawatan.pasien_id', '=', 'data_pasien.id')
                 ->join('data_poli', 'data_pendaftar_perawatan.poli_id', '=', 'data_poli.id')
@@ -583,16 +582,15 @@ class PerawatanController extends Controller
 
     public function get_antre_poli()
     {
-        if(Session::get('role') == 'dokter'){
+        if(session('role') == 'dokter'){
             $pendaftaran_pasien = DB::table('data_pendaftar_perawatan')
-                ->where('data_pendaftar_perawatan.status', '=', 'antri')
-                ->orWhere('data_pendaftar_perawatan.status', '=', 'diperiksa')
                 ->join('data_pasien', 'data_pendaftar_perawatan.pasien_id', '=', 'data_pasien.id')
                 ->join('data_poli', 'data_pendaftar_perawatan.poli_id', '=', 'data_poli.id')
                 ->join('data_dokter_poli', 'data_pendaftar_perawatan.dokter_poli_id', '=', 'data_dokter_poli.id')
                 ->join('users', 'data_pendaftar_perawatan.dokter_id', '=', 'users.id')
                 ->join('conf_antrean_rawat_jalan', 'data_pendaftar_perawatan.id', '=', 'conf_antrean_rawat_jalan.pendaftaran_perawatan_id')
-                ->where('data_pendaftar_perawatan.dokter_id', Auth()->user()->id)
+                ->whereIn('data_pendaftar_perawatan.status', ['antri', 'diperiksa'])
+                ->where('data_pendaftar_perawatan.dokter_id', auth()->user()->id)
                 ->select('data_pendaftar_perawatan.*', 'data_pasien.nama_pasien as nama_pasien', 'data_poli.nama_poli as nama_poli', 'users.name as nama_dokter', 'conf_antrean_rawat_jalan.no_antreaan as no_antrian')
                 ->orderBy('data_pendaftar_perawatan.tanggal_pendaftaran', 'desc')
                 ->get();
@@ -624,32 +622,20 @@ class PerawatanController extends Controller
 
     public function get_riwayat_perawatan()
     {
-        $pendaftaran_pasien = DB::table('data_pendaftar_perawatan')
-            ->where('data_pendaftar_perawatan.status', '=', 'selesai')
-            ->orWhere('data_pendaftar_perawatan.status', '=', 'batal')
-            ->join('data_pasien', 'data_pendaftar_perawatan.pasien_id', '=', 'data_pasien.id')
-            ->join('data_poli', 'data_pendaftar_perawatan.poli_id', '=', 'data_poli.id')
-            ->join('data_dokter_poli', 'data_pendaftar_perawatan.dokter_poli_id', '=', 'data_dokter_poli.id')
-            ->join('users', 'data_pendaftar_perawatan.dokter_id', '=', 'users.id')
-            ->orderBy('data_pendaftar_perawatan.tgl_periksa', 'desc')
-            ->select('data_pendaftar_perawatan.*', 'data_pasien.nama_pasien as nama_pasien', 'data_poli.nama_poli as nama_poli', 'users.name as nama_dokter')
-            ->get();
-        if(Session::get('role') == 'dokter'){
+        if(session('role') == 'dokter'){
             $pendaftaran_pasien = DB::table('data_pendaftar_perawatan')
-                ->where('data_pendaftar_perawatan.status', '=', 'selesai')
-                ->orWhere('data_pendaftar_perawatan.status', '=', 'batal')
                 ->join('data_pasien', 'data_pendaftar_perawatan.pasien_id', '=', 'data_pasien.id')
                 ->join('data_poli', 'data_pendaftar_perawatan.poli_id', '=', 'data_poli.id')
                 ->join('data_dokter_poli', 'data_pendaftar_perawatan.dokter_poli_id', '=', 'data_dokter_poli.id')
                 ->join('users', 'data_pendaftar_perawatan.dokter_id', '=', 'users.id')
-                ->where('data_pendaftar_perawatan.dokter_id', Auth()->user()->id)
+                ->whereIn('data_pendaftar_perawatan.status', ['selesai', 'batal'])
+                ->where('data_pendaftar_perawatan.dokter_id', auth()->user()->id)
                 ->orderBy('data_pendaftar_perawatan.tgl_periksa', 'desc')
                 ->select('data_pendaftar_perawatan.*', 'data_pasien.nama_pasien as nama_pasien', 'data_poli.nama_poli as nama_poli', 'users.name as nama_dokter')
                 ->get();
         } else {
             $pendaftaran_pasien = DB::table('data_pendaftar_perawatan')
-                ->where('data_pendaftar_perawatan.status', '=', 'selesai')
-                ->orWhere('data_pendaftar_perawatan.status', '=', 'batal')
+                ->whereIn('data_pendaftar_perawatan.status', ['selesai', 'batal'])
                 ->join('data_pasien', 'data_pendaftar_perawatan.pasien_id', '=', 'data_pasien.id')
                 ->join('data_poli', 'data_pendaftar_perawatan.poli_id', '=', 'data_poli.id')
                 ->join('data_dokter_poli', 'data_pendaftar_perawatan.dokter_poli_id', '=', 'data_dokter_poli.id')
