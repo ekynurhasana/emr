@@ -246,13 +246,15 @@
                                     <p>Data Pasien Asuransi</p>
                                     </a>
                                 </li>
-                                <li class="nav-header emr-sub-menu" id="li-users">Users</li>
-                                <li class="nav-item">
-                                    <a href="/users" class="nav-link" id="sub-user">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Data Users</p>
-                                    </a>
-                                </li>
+                                @if(in_array(Session::get('role'), ['super-admin']))
+                                    <li class="nav-header emr-sub-menu" id="li-users">Users</li>
+                                    <li class="nav-item">
+                                        <a href="/users" class="nav-link" id="sub-user">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Data Users</p>
+                                        </a>
+                                    </li>
+                                @endif
                             @endif
                         </ul>
                         {{-- <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">

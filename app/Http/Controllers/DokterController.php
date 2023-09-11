@@ -365,6 +365,13 @@ class DokterController extends Controller
         $type = $request->type;
         if ($type == "dokter_poli"){
             $jadwal = DB::table('data_jadwal_praktek')->where('dokter_poli_id', $id)->get();
+            $antrean = DB::table('conf_antrean_rawat_jalan')->where('dokter_poli_id', $id)->get();
+            try {
+                DB::table('conf_antrean_rawat_jalan')->where('dokter_poli_id', $id)->delete();
+                return redirect('data-dokter-poli')->with('success', 'Data Dokter Poliklinik berhasil dihapus');
+            } catch (\Throwable $th) {
+                return redirect('data-dokter-poli')->with('error', 'Data gagal dihapus');
+            }
             if (isset($jadwal)) {
                 foreach ($jadwal as $key => $value) {
                     $delete_jadwal = DB::table('data_jadwal_praktek')->where('id', $value->id)->delete();
