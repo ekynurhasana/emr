@@ -45,7 +45,7 @@
                                     <ul class="list-inline">
                                         <li class="list-inline-item">
                                             @if ($user->file_foto != null)
-                                                <img alt="Avatar" class="table-avatar img-fluid img-circle" src="{{asset('/asset/img/profile_users/'.$user->file_foto)}}">
+                                                <img alt="Avatar" class="table-avatar img-fluid img-circle" src="{{asset('/storage/foto_profil/'.$user->file_foto)}}">
                                             @else
                                                 @if ($user->jenis_kelamin == 'L')
                                                     <img alt="Avatar" class="table-avatar" src="{{asset('/asset/img/avatar-lk.png')}}">
