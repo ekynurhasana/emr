@@ -70,7 +70,7 @@
                         <div class="card-body box-profile">
                             <div class="text-center">
                                 @if ($user->file_foto != null)
-                                    <img class="profile-user-img img-fluid img-circle" src="{{asset('/asset/img/profile_users/'.$user->file_foto)}}" alt="User profile picture" style="width: 150px; height: 150px;" id="foto_profil">
+                                    <img class="profile-user-img img-fluid img-circle" src="{{asset('/storage/foto_profil/'.$user->file_foto)}}" alt="User profile picture" style="width: 150px; height: 150px;" id="foto_profil">
                                 @else
                                     @if ($user->jenis_kelamin == 'L')
                                         <img class="profile-user-img img-fluid img-circle" src="{{asset('/asset/img/avatar-lk.png')}}" alt="User profile picture" style="width: 150px; height: 150px;" id="foto_profil">
