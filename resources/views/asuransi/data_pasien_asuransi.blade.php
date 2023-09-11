@@ -8,12 +8,9 @@
 {{-- <div --}}
 <div class="row">
     <div class="col-md-4 col-sm-12 col-xs-12">
-        {{-- cek user role --}}
-        @if (Auth::user()->role == 'super-admin')
-            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modal-tambah-pasien-asuransi" id="btn-tambah-pasien-asuransi" onclick="getDataDropdownPasienAsuransi()">
-                Tambah Pasien Asuransi
-            </button>
-        @endif
+        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modal-tambah-pasien-asuransi" id="btn-tambah-pasien-asuransi" onclick="getDataDropdownPasienAsuransi()">
+            Tambah Pasien Asuransi
+        </button>
     </div>
 </div><br>
 
@@ -53,11 +50,9 @@
                                 </td>
                                 <td class="text-center">
                                     <a href="{{url('/pasien-asuransi/detail/'.$ps->id)}}" class="btn btn-primary btn-sm"><i class="fas fa-eye"></i> </a>
-                                    @if (Auth::user()->role == 'super-admin')
-                                        <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#modal-hapus-pasien-asuransi" data-id="{{$ps->id}}" data-nama="{{$ps->nama_pasien}}" data-asuransi="{{$ps->nama_asuransi}}">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    @endif
+                                    <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#modal-hapus-pasien-asuransi" data-id="{{$ps->id}}" data-nama="{{$ps->nama_pasien}}" data-asuransi="{{$ps->nama_asuransi}}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
                                 </td>
                             </tr>
                         @php $no++; @endphp

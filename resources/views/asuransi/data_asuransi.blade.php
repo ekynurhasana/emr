@@ -8,12 +8,9 @@
 {{-- <div --}}
 <div class="row">
     <div class="col-md-4 col-sm-12 col-xs-12">
-        {{-- cek user role --}}
-        @if (Auth::user()->role == 'super-admin')
-            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modal-tambah-asuransi" id="btn-tambah-asuransi">
-                Tambah Asuransi
-            </button>
-        @endif
+        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modal-tambah-asuransi" id="btn-tambah-asuransi">
+            Tambah Asuransi
+        </button>
     </div>
 </div><br>
 
@@ -51,11 +48,9 @@
                                 </td>
                                 <td class="text-center">
                                     <a href="{{url('/asuransi/detail/'.$asuransi->id)}}" class="btn btn-primary btn-sm"><i class="fas fa-eye"></i> </a>
-                                    @if (Auth::user()->role == 'super-admin')
-                                        <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#modal-hapus-asuransi" data-id="{{$asuransi->id}}" data-nama="{{$asuransi->nama_asuransi}}">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    @endif
+                                    <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#modal-hapus-asuransi" data-id="{{$asuransi->id}}" data-nama="{{$asuransi->nama_asuransi}}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
                                 </td>
                             </tr>
                         @php $no++; @endphp
