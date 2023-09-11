@@ -129,24 +129,26 @@
                                 </div>
                             @enderror
                         </div>
-                        <div class="form-group" id="form-role">
-                            <label class="required" for="role">Role</label>
-                            <select class="custom-select form-control-border emr-edit-select @error('role') is-invalid @enderror" id="role" disabled name="role" required>
-                                <option value="">Pilih Role</option>
-                                <option value="super-admin" @if($user->role == 'super-admin') selected @endif>Super Admin</option>
-                                <option value="admin" @if($user->role == 'admin') selected @endif>Admin</option>
-                                <option value="dokter" @if($user->role == 'dokter') selected @endif>Dokter</option>
-                                <option value="perawat" @if($user->role == 'perawat') selected @endif>Perawat</option>
-                                <option value="apoteker" @if($user->role == 'apoteker') selected @endif>Apoteker</option>
-                                <option value="kasir" @if($user->role == 'kasir') selected @endif>Kasir</option>
-                                <option value="user" @if($user->role == 'user') selected @endif>User</option>
-                            </select>
-                            @error('role')
-                                <div class="invalid-feedback">
-                                    {{$message}}
-                                </div>
-                            @enderror
-                        </div>
+                        @if(in_array(Session::get('role'), ['super-admin']))
+                            <div class="form-group" id="form-role">
+                                <label class="required" for="role">Role</label>
+                                <select class="custom-select form-control-border emr-edit-select @error('role') is-invalid @enderror" id="role" disabled name="role" required>
+                                    <option value="">Pilih Role</option>
+                                    <option value="super-admin" @if($user->role == 'super-admin') selected @endif>Super Admin</option>
+                                    <option value="admin" @if($user->role == 'admin') selected @endif>Admin</option>
+                                    <option value="dokter" @if($user->role == 'dokter') selected @endif>Dokter</option>
+                                    <option value="perawat" @if($user->role == 'perawat') selected @endif>Perawat</option>
+                                    <option value="apoteker" @if($user->role == 'apoteker') selected @endif>Apoteker</option>
+                                    <option value="kasir" @if($user->role == 'kasir') selected @endif>Kasir</option>
+                                    <option value="user" @if($user->role == 'user') selected @endif>User</option>
+                                </select>
+                                @error('role')
+                                    <div class="invalid-feedback">
+                                        {{$message}}
+                                    </div>
+                                @enderror
+                            </div>
+                        @endif
                     </div>
                 </div>
                 <div class="form-group">

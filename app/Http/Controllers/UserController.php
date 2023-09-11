@@ -76,6 +76,11 @@ class UserController extends Controller
 
     public function detail($id)
     {
+        if(!in_array(Auth::user()->role, ['super-admin', 'admin'])){
+            if($id != Auth::user()->id){
+                return redirect('users/detail/' . Auth::user()->id);
+            }
+        }
         $user = DB::table('users')->
             join('detail_user', 'users.id', '=', 'detail_user.user_id')->
             select(
