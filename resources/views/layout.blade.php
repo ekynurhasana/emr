@@ -92,7 +92,7 @@
                                     <img src="{{asset('/asset/img/avatar-pr.png')}}" class="img-circle elevation-2" alt="User Image" style="width: 30px; height: 30px;">
                                 @endif
                             @else
-                                <img src="{{asset('/asset/img/profile_users/'.Session::get('detail_user')->file_foto)}}" class="img-circle elevation-2" alt="User Image" style="width: 30px; height: 30px;">
+                                <img src="{{asset('/storage/foto_profil/'.Session::get('detail_user')->file_foto)}}" class="img-circle elevation-2" alt="User Image" style="width: 30px; height: 30px;">
                             @endif
                         </a>
                         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
@@ -131,7 +131,7 @@
                                     <img src="{{asset('/asset/img/avatar-pr.png')}}" class="img-circle elevation-2" alt="User Image">
                                 @endif
                             @else
-                                <img src="{{asset('/asset/img/profile_users/'.Session::get('detail_user')->file_foto)}}" class="img-circle elevation-2" alt="User Image">
+                                <img src="{{asset('/storage/foto_profil/'.Session::get('detail_user')->file_foto)}}" class="img-circle elevation-2" alt="User Image">
                             @endif
                         </div>
                         <div class="info">
