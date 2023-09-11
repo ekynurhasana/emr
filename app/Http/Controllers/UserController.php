@@ -157,7 +157,7 @@ class UserController extends Controller
         // request and save file
         if ($request->foto_base64 != '' or $request->foto_base64 != null) {
             if ($request->foto_lama != '' or $request->foto_lama != null) {
-                $file_path = public_path() . '/asset/img/profile_users/' . $request->foto_lama;
+                $file_path = asset('storage/public/asset/foto_profil/' . $request->foto_lama);
                 if (file_exists($file_path)) {
                     try {
                         unlink($file_path);
@@ -174,7 +174,7 @@ class UserController extends Controller
             $file_name = time() . '-' . $request->nama_foto;
             // save to public path
             try {
-                Storage::disk('public')->put('asset/img/profile_users/' . $file_name, $file);
+                Storage::disk('public')->put('asset/foto_profil/' . $file_name, $file);
             } catch (\Exception $e) {
                 return redirect('users/detail/' . $id)->with('error', 'Data gagal diubah\n' . $e->getMessage());
             }
