@@ -368,7 +368,6 @@ class DokterController extends Controller
             $antrean = DB::table('conf_antrean_rawat_jalan')->where('dokter_poli_id', $id)->get();
             try {
                 DB::table('conf_antrean_rawat_jalan')->where('dokter_poli_id', $id)->delete();
-                return redirect('data-dokter-poli')->with('success', 'Data Dokter Poliklinik berhasil dihapus');
             } catch (\Throwable $th) {
                 return redirect('data-dokter-poli')->with('error', 'Data gagal dihapus');
             }
