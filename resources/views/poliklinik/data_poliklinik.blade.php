@@ -165,7 +165,7 @@
         var id = button.data('id')
         var nama = button.data('nama')
         var modal = $(this)
-        modal.find('.modal-body #modal_body_delete').text('Apakah anda yakin ingin menghapus Poliklinik '+nama+'?')
+        modal.find('.modal-body #modal_body_delete').text('Apakah anda yakin ingin menghapus Poliklinik '+nama+'? Apabila Poliklinik ini dihapus, maka semua data yang berhubungan dengan Poliklinik ini akan hilang.')
         $('#id_poliklinik').val(id)
     });
 </script>

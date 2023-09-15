@@ -366,10 +366,28 @@ class DokterController extends Controller
         if ($type == "dokter_poli"){
             $jadwal = DB::table('data_jadwal_praktek')->where('dokter_poli_id', $id)->get();
             $antrean = DB::table('conf_antrean_rawat_jalan')->where('dokter_poli_id', $id)->get();
+            $pendaftaran = DB::table('data_pendaftar_perawatan')->where('dokter_poli_id', $id)->get();
+            $resep = DB::table('data_resep_obat_pasien')->where('dokter_poli_id', $id)->get();
             try {
                 DB::table('conf_antrean_rawat_jalan')->where('dokter_poli_id', $id)->delete();
             } catch (\Throwable $th) {
                 return redirect('data-dokter-poli')->with('error', 'Data gagal dihapus');
+            }
+            if (isset($pendaftaran)) {
+                foreach ($pendaftaran as $key => $value) {
+                    $delete_pendaftaran = DB::table('data_pendaftar_perawatan')->where('id', $value->id)->update(['dokter_poli_id' => null]);
+                    if (!$delete_pendaftaran) {
+                        return redirect('data-dokter-poli')->with('error', 'Data pendaftaran gagal diupdate');
+                    }
+                }
+            }
+            if (isset($resep)) {
+                foreach ($resep as $key => $value) {
+                    $delete_resep = DB::table('data_resep_obat_pasien')->where('id', $value->id)->update(['dokter_poli_id' => null]);
+                    if (!$delete_resep) {
+                        return redirect('data-dokter-poli')->with('error', 'Data resep gagal diupdate');
+                    }
+                }
             }
             if (isset($jadwal)) {
                 foreach ($jadwal as $key => $value) {

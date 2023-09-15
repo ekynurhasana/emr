@@ -119,6 +119,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/tagihan/tambah-line', [KasirController::class, 'tambah_line'])->middleware('role:super-admin|kasir');
     Route::post('/tagihan/bayar', [KasirController::class, 'change_state'])->middleware('role:super-admin|kasir');
     Route::get('/tagihan-pasien/draft', [KasirController::class, 'get_data_draft'])->middleware('role:super-admin|kasir');
+    Route::delete('/tagihan/delete', [KasirController::class, 'delete'])->middleware('role:super-admin|kasir');
     Route::delete('/tagihan/line/delete', [KasirController::class, 'delete_line'])->middleware('role:super-admin|kasir');
 
     // asuransi

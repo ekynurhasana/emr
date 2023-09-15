@@ -185,6 +185,27 @@ class KasirController extends Controller
         }
     }
 
+    public function delete(Request $request)
+    {
+        $id = $request->id_tagihan;
+        $tagihan_line = DB::table('data_tagihan_pasien_line')
+            ->where('tagihan_pasien_id', $id)
+            ->get();
+        for ($i = 0; $i < count($tagihan_line); $i++) {
+            try {
+                DB::table('data_tagihan_pasien_line')->where('id', $tagihan_line[$i]->id)->delete();
+            } catch (\Throwable $th) {
+                return redirect()->back()->with('error', 'Data gagal dihapus ' . $th->getMessage());
+            }
+        }
+        try {
+            DB::table('data_tagihan_pasien')->where('id', $id)->delete();
+            return redirect()->back()->with('success', 'Data berhasil dihapus');
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('error', 'Data gagal dihapus ' . $th->getMessage());
+        }
+    }
+
     public function delete_line(Request $request)
     {
         $id = $request->id_tagihan_line;

@@ -7,6 +7,9 @@
 @section('content')
 <div class="row">
     <div class="col-sm-12 col-md-6 col-lg-6">
+        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#modal-hapus-tagihan" data-id="{{$data->id}}" data-nama="{{$data->no_tagihan}}">
+            <i class="fas fa-trash"></i> Hapus Tagihan
+        </button>
         <a href="{{url('/rawat-jalan/detail/'.$data->pendaftaran_id)}}" class="btn btn-info">
             Detail Perawatan
         </a>
@@ -251,6 +254,32 @@
     </div>
 </div>
 <div>
+    <div class="modal fade" id="modal-hapus-tagihan" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content bg-danger">
+                <div class="modal-header">
+                    <h4 class="modal-title">Danger!!!</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="modal_body_delete"></div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-outline-light" data-dismiss="modal">Close</button>
+                    <form id="form-hapus-tagihan" method="POST" action="/tagihan/delete">
+                        @csrf
+                        <input type="hidden" name="id_tagihan" id="id_tagihan">
+                        <input type="method" name="_method" value="DELETE" id="_method" hidden>
+                        <button type="submit" class="btn btn-outline-light">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div>
     <div class="modal fade" id="modal-hapus-tagihan-line" role="dialog" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content bg-danger">
@@ -337,6 +366,14 @@
         } else {
             $('#tr_diskon').show();
         }
+    });
+    $('#modal-hapus-tagihan').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget)
+        var id = button.data('id')
+        var nama = button.data('nama')
+        var modal = $(this)
+        modal.find('.modal-body #modal_body_delete').text('Apakah anda yakin ingin menghapus tagihan ' + nama + '?')
+        $('#id_tagihan').val(id)
     });
     $('#modal-hapus-tagihan-line').on('show.bs.modal', function (event) {
         var button = $(event.relatedTarget)

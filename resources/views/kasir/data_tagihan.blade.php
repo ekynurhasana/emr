@@ -6,15 +6,6 @@
 @endsection
 @section('content')
 {{-- <div --}}
-<div class="row">
-    <div class="col-md-4 col-sm-12 col-xs-12">
-        @if($sub_menu_slug == 'tagihan-pasien-draft')
-        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modal-tambah-tagihan" id="btn-tambah-tagihan">
-            Tambah Tagihan Baru
-        </button>
-        @endif
-    </div>
-</div><br>
 
 <div class="row">
     <div class="col-md-12 col-sm-12 col-xs-12">
