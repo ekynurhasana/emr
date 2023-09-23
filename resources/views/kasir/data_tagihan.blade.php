@@ -46,9 +46,11 @@
                                     @endif
                                 <td class="text-center">
                                     <a href="{{url('/tagihan/detail/'.$tg->id)}}" class="btn btn-primary btn-sm"><i class="fas fa-eye"></i> </a>
-                                    <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#modal-hapus-tagihan" data-id="{{$tg->id}}" data-nama="{{$tg->no_tagihan}}">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
+                                    @if (in_array(Session::get('role'), ['super-admin']))
+                                        <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#modal-hapus-tagihan" data-id="{{$tg->id}}" data-nama="{{$tg->no_tagihan}}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    @endif
                                 </td>
                             </tr>
                         @php $no++; @endphp
@@ -160,7 +162,7 @@
         var nama = button.data('nama')
         var modal = $(this)
         modal.find('.modal-body #modal_body_delete').text('Apakah anda yakin ingin menghapus tagihan ' + nama + '?')
-        $('#id_obat').val(id)
+        $('#id_tagihan').val(id)
     });
 </script>
 @if (session('errors'))

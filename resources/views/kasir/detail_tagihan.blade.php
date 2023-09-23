@@ -7,9 +7,11 @@
 @section('content')
 <div class="row">
     <div class="col-sm-12 col-md-6 col-lg-6">
-        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#modal-hapus-tagihan" data-id="{{$data->id}}" data-nama="{{$data->no_tagihan}}">
-            <i class="fas fa-trash"></i> Hapus Tagihan
-        </button>
+        @if(in_array(Session::get('role'), ['super-admin']))
+            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#modal-hapus-tagihan" data-id="{{$data->id}}" data-nama="{{$data->no_tagihan}}">
+                <i class="fas fa-trash"></i> Hapus Tagihan
+            </button>
+        @endif
         <a href="{{url('/rawat-jalan/detail/'.$data->pendaftaran_id)}}" class="btn btn-info">
             Detail Perawatan
         </a>
