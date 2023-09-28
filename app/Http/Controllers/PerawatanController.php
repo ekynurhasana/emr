@@ -292,12 +292,19 @@ class PerawatanController extends Controller
             'alergi_obat' => $request->alergi_obat ?? '',
             'keluhan' => $request->keluhan,
             'riwayat_penyakit' => $request->riwayat_penyakit ?? '',
+            'riwayat_rawat_inap' => $request->riwayat_rawat_inap ?? '',
+            'riwayat_operasi' => $request->riwayat_operasi ?? '',
             'tekanan_darah' => $request->tekanan_darah,
             'nadi' => $request->nadi ?? '',
             'berat_badan' => $request->berat_badan,
             'tinggi_badan' => $request->tinggi_badan,
             'suhu_badan' => $request->suhu_badan ?? '',
-            'pemeriksaan_fisik_lainnya' => $request->pemeriksaan_fisik_lainnya ?? '',
+            // 'pemeriksaan_fisik_lainnya' => $request->pemeriksaan_fisik_lainnya ?? '',
+            'cara_berjalan_pasien' => $request->cara_berjalan_pasien ?? '',
+            'menopang_saat_akan_duduk' => $request->menopang_saat_akan_duduk ?? '',
+            'resiko_jatuh' => $request->resiko_jatuh ?? '',
+            'tindakan_pengamanan_jatuh' => $request->tindakan_pengamanan_jatuh ?? '',
+            'perawat_pemeriksa' => $request->perawat_pemeriksa ?? '',
         ];
         if($request->alergi_obat != null || $request->alergi_obat != ''){
             try {

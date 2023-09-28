@@ -236,6 +236,24 @@
                             </div>
                         @enderror
                     </div>
+                    <div class="form-group">
+                        <label for="riwayat_rawat_inap">Riwayat Rawat Inap</label>
+                        <textarea id="riwayat_rawat_inap" class="form-control" readonly name="riwayat_rawat_inap">{{$data->riwayat_rawat_inap}}</textarea>
+                        @error('riwayat_rawat_inap')
+                            <div class="invalid-feedback">
+                                {{$message}}
+                            </div>
+                        @enderror
+                    </div>
+                    <div class="form-group">
+                        <label for="riwayat_operasi">Riwayat Operasi</label>
+                        <textarea id="riwayat_operasi" class="form-control" readonly name="riwayat_operasi">{{$data->riwayat_operasi}}</textarea>
+                        @error('riwayat_operasi')
+                            <div class="invalid-feedback">
+                                {{$message}}
+                            </div>
+                        @enderror
+                    </div>
                     <div class="row">
                         <div class="col-sm-12 col-md-6 col-lg-6">
                             <label class="required" for="berat_badan">Berat Badan</label>
@@ -311,7 +329,7 @@
                         @enderror
                     </div>
                     <div class="form-group">
-                        <label for="alergi_obat">Alergi Obat</label>
+                        <label for="alergi_obat">Alergi Obat / Makanan / lainnya</label>
                         <textarea id="alergi_obat" class="form-control @error('alergi_obat') is-invalid @enderror" readonly name="alergi_obat">{{$data->alergi_obat}}</textarea>
                         @error('alergi_obat')
                             <div class="invalid-feedback">
@@ -319,10 +337,69 @@
                             </div>
                         @enderror
                     </div>
-                    <div class="form-group">
+                    {{-- <div class="form-group">
                         <label for="pemeriksaan_fisik_lainnya">Pemeriksaan Fisik Lainnya</label>
                         <textarea id="pemeriksaan_fisik_lainnya" class="form-control @error('pemeriksaan_fisik_lainnya') is-invalid @enderror" readonly name="pemeriksaan_fisik_lainnya">{{$data->pemeriksaan_fisik_lainnya}}</textarea>
                         @error('pemeriksaan_fisik_lainnya')
+                            <div class="invalid-feedback">
+                                {{$message}}
+                            </div>
+                        @enderror
+                    </div> --}}
+                    <div class="form-group">
+                        <label for="cara_berjalan_pasien">Cara Berjalan Pasien</label>
+                        <select class="form-control select2 @error('cara_berjalan_pasien') is-invalid @enderror" id="cara_berjalan_pasien" name="cara_berjalan_pasien" style="width: 100%;" disabled onchange="hasilResikoJatuh()">
+                            <option value="">-- Pilih Cara Berjalan Pasien --</option>
+                            <option value="tidak_seimbang" {{$data->cara_berjalan_pasien == 'tidak_seimbang' ? 'selected' : ''}}>Tidak Seimbang /  sempoyongan / limbung</option>
+                            <option value="menggunakan_alat_bantu" {{$data->cara_berjalan_pasien == 'menggunakan_alat_bantu' ? 'selected' : ''}}>Menggunakan Alat Bantu</option>
+                            <option value="keduanya" {{$data->cara_berjalan_pasien == 'keduanya' ? 'selected' : ''}}>Keduanya</option>
+                        </select>
+                        @error('cara_berjalan_pasien')
+                            <div class="invalid-feedback">
+                                {{$message}}
+                            </div>
+                        @enderror
+                    </div>
+                    <div class="form-group">
+                        <label for="menopang_saat_akan_duduk">Menopang Saat Akan Duduk</label>
+                        <select class="form-control select2 @error('menopang_saat_akan_duduk') is-invalid @enderror" id="menopang_saat_akan_duduk" name="menopang_saat_akan_duduk" style="width: 100%;" disabled onchange="hasilResikoJatuh()">
+                            <option value="tidak">-- Pilih Menopang Saat Akan Duduk --</option>
+                            <option value="ya" {{$data->menopang_saat_akan_duduk == 'ya' ? 'selected' : ''}}>Ya</option>
+                            <option value="tidak" {{$data->menopang_saat_akan_duduk == 'tidak' ? 'selected' : ''}}>Tidak</option>
+                        </select>
+                        @error('menopang_saat_akan_duduk')
+                            <div class="invalid-feedback">
+                                {{$message}}
+                            </div>
+                        @enderror
+                    </div>
+                    <div class="form-group">
+                        <label for="resiko_jatuh">Hasil Resiko Jatuh</label>
+                        <select class="form-control select2 @error('resiko_jatuh') is-invalid @enderror" id="resiko_jatuh" name="resiko_jatuh" style="width: 100%;" disabled onchange="hasilResikoJatuh()">
+                            <option value="">-- Pilih Hasil Resiko Jatuh --</option>
+                            <option value="tidak_beresiko" {{$data->resiko_jatuh == 'tidak_beresiko' ? 'selected' : ''}}>Tidak Beresiko</option>
+                            <option value="resiko_rendah" {{$data->resiko_jatuh == 'resiko_rendah' ? 'selected' : ''}}>Resiko Rendah</option>
+                            <option value="resiko_tinggi" {{$data->resiko_jatuh == 'resiko_tinggi' ? 'selected' : ''}}>Resiko Tinggi</option>
+                        </select>
+                        @error('resiko_jatuh')
+                            <div class="invalid-feedback">
+                                {{$message}}
+                            </div>
+                        @enderror
+                    </div>
+                    <div class="form-group">
+                        <label for="tindakan_pengamanan_jatuh">Hasil Tindakan Pengamanan Pasien</label>
+                        <textarea id="tindakan_pengamanan_jatuh" class="form-control @error('tindakan_pengamanan_jatuh') is-invalid @enderror" readonly name="tindakan_pengamanan_jatuh">{{$data->tindakan_pengamanan_jatuh}}</textarea>
+                        @error('tindakan_pengamanan_jatuh')
+                            <div class="invalid-feedback">
+                                {{$message}}
+                            </div>
+                        @enderror
+                    </div>
+                    <div class="form-group">
+                        <label for="perawat_pemeriksa" class="required">Perawat Pemeriksa</label>
+                        <input type="text" id="perawat_pemeriksa" class="form-control" value="{{$data->perawat_pemeriksa}}" readonly name="perawat_pemeriksa" required>
+                        @error('perawat_pemeriksa')
                             <div class="invalid-feedback">
                                 {{$message}}
                             </div>
@@ -695,6 +772,36 @@
             $('#id').val(id)
         });
     });
+    function hasilResikoJatuh() {
+        var cara_berjalan_pasien = $("#cara_berjalan_pasien").val();
+        var menopang_saat_akan_duduk = $("#menopang_saat_akan_duduk").val();
+        var resiko_jatuh_html = $("#resiko_jatuh")
+        if ((cara_berjalan_pasien == "menggunakan_alat_bantu") && (menopang_saat_akan_duduk == "tidak")) {
+            console.log("resiko tinggi");
+            $("#resiko_jatuh").val("resiko_rendah");
+        } else if ((cara_berjalan_pasien == "menggunakan_alat_bantu") && (menopang_saat_akan_duduk == "ya")) {
+            $("#resiko_jatuh").val("resiko_tinggi");
+        } else if ((cara_berjalan_pasien == "tidak_seimbang") && (menopang_saat_akan_duduk == "tidak")) {
+            $("#resiko_jatuh").val("resiko_rendah");
+        } else if ((cara_berjalan_pasien == "tidak_seimbang") && (menopang_saat_akan_duduk == "ya")) {
+            $("#resiko_jatuh").val("resiko_tinggi");
+        } else if ((cara_berjalan_pasien == "keduanya") && (menopang_saat_akan_duduk == "tidak")) {
+            $("#resiko_jatuh").val("resiko_tinggi");
+        } else if ((cara_berjalan_pasien == "keduanya") && (menopang_saat_akan_duduk == "ya")) {
+            $("#resiko_jatuh").val("resiko_tinggi");
+        } else {
+            $("#resiko_jatuh").val("");
+        }
+
+        var resiko_jatuh = $("#resiko_jatuh").val();
+        if (resiko_jatuh == "resiko_rendah") {
+            $("#tindakan_pengamanan_jatuh").val("Edukasi pasien dan keluarga tentang resiko jatuh");
+        } else if (resiko_jatuh == "resiko_tinggi") {
+            $("#tindakan_pengamanan_jatuh").val("1. Edukasi pasien dan keluarga tentang resiko jatuh\n2. Pasang ID Card berwarna kuning (tanda peringatan jatuh)");
+        } else {
+            $("#tindakan_pengamanan_jatuh").val("");
+        }
+    }
 </script>
 <script>
     $(function () {
@@ -721,12 +828,19 @@
         $('#alergi_obat').removeAttr('readonly');
         $('#keluhan').removeAttr('readonly');
         $('#riwayat_penyakit').removeAttr('readonly');
+        $('#riwayat_rawat_inap').removeAttr('readonly');
+        $('#riwayat_operasi').removeAttr('readonly');
         $('#berat_badan').removeAttr('readonly');
         $('#tinggi_badan').removeAttr('readonly');
         $('#tekanan_darah').removeAttr('readonly');
         $('#nadi').removeAttr('readonly');
         $('#suhu_badan').removeAttr('readonly');
-        $('#pemeriksaan_fisik_lainnya').removeAttr('readonly');
+        // $('#pemeriksaan_fisik_lainnya').removeAttr('readonly');
+        $('#cara_berjalan_pasien').removeAttr('disabled');
+        $('#menopang_saat_akan_duduk').removeAttr('disabled');
+        $('#resiko_jatuh').removeAttr('disabled');
+        $('#tindakan_pengamanan_jatuh').removeAttr('readonly');
+        $('#perawat_pemeriksa').removeAttr('readonly');
         $('#btn-edit-screening').hide();
         $('#btn-save-screening').show();
         $('#btn-batal-screening').show();

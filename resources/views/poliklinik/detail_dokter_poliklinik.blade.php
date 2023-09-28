@@ -15,7 +15,7 @@
                 <i class="fas fa-trash"></i>
             </button>
         @endif
-        @if(Auth::user()->id == $data->dokter_id)
+        @if(Auth::user()->id == $data->dokter_id or in_array(Auth::user()->role, ['super-admin']))
             @if($data->status == 'tutup' && $is_buka)
                 <button type="button" class="btn btn-success" id="btn-buka-jadwal-praktek" onclick="updateStatusPraktek()">
                     Buka Praktek
@@ -313,7 +313,12 @@
 <script src="{{asset('/adminlte/plugins/datatables-buttons/js/buttons.html5.min.js')}}"></script>
 <script src="{{asset('/adminlte/plugins/datatables-buttons/js/buttons.print.min.js')}}"></script>
 <script src="{{asset('/adminlte/plugins/datatables-buttons/js/buttons.colVis.min.js')}}"></script>
-@if(Auth::user()->id == $data->dokter_id)
+<script>
+    $(document).ready(function(){
+        $('#biaya_tambahan').val(formatRupiah($('#biaya_tambahan').val()));
+    });
+</script>
+@if(Auth::user()->id == $data->dokter_id or in_array(Auth::user()->role, ['super-admin']))
 <script>
     $(document).ready(function(){
         $('#biaya_tambahan').val(formatRupiah($('#biaya_tambahan').val()));

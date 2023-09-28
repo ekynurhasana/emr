@@ -22,7 +22,7 @@
                 </div>
             @endif
 
-            <form action="#" method="post">
+            <form action="/login" method="post">
                 @csrf
                 <div class="input-group mb-3">
                     <input type="email" class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}" placeholder="Email" name="email" value="{{ old('email') }}" autofocus>
