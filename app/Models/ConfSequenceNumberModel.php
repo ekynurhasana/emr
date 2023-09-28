@@ -65,6 +65,7 @@ class ConfSequenceNumberModel extends Model
         } elseif ($sequence_number->reset_number == 'never') {
             $sequence_number->last_number = $sequence_number->last_number + 1;
         }
+        $sequence_number->updated_at = $date_now;
         $sequence_number->save();
         $separator = strval($sequence_number->separator) != '' ? strval($sequence_number->separator) : '';
         $prefix = $sequence_number->prefix . $separator;
