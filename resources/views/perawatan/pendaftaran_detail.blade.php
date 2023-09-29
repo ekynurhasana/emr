@@ -421,7 +421,7 @@
                     <li class="nav-item">
                         <a class="nav-link {{$data->status != 'diperiksa' ? 'active' : ''}}" id="emr-tabs-riwayat-tab" data-toggle="pill" href="#emr-tabs-riwayat" role="tab" aria-controls="emr-tabs-riwayat">Riwayat Rekam Medik</a>
                     </li>
-                    @if(!in_array($data->status, ['baru']))
+                    @if(in_array($data->status, ['selesai']))
                     <li class="nav-item">
                         <a class="nav-link" id="emr-tabs-resep-obat-tab" data-toggle="pill" href="#emr-tabs-resep-obat" role="tab" aria-controls="emr-tabs-resep-obat">Detail Resep Obat</a>
                     </li>
@@ -553,7 +553,7 @@
                             </table>
                         </div>
                     </div>
-                    @if(!in_array($data->status, ['baru']))
+                    @if(in_array($data->status, ['selesai']))
                     <div class="tab-pane fade" id="emr-tabs-resep-obat" role="tabpanel" aria-labelledby="emr-tabs-resep-obat-tab">
                         <div>
                             <table id="tabel_riwayat_obat" class="table table-bordered table-hover">
