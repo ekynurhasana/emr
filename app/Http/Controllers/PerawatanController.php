@@ -129,7 +129,7 @@ class PerawatanController extends Controller
                 ->first();
         }
         $resep_line = null;
-        if ($pendaftaran_pasien->status == 'selesai') {
+        if ($pendaftaran_pasien->status != 'baru') {
             $resep_line = DB::table('data_resep_obat_pasien_line')
                 ->join('data_resep_obat_pasien', 'data_resep_obat_pasien_line.resep_obat_pasien_id', '=', 'data_resep_obat_pasien.id')
                 ->where('data_resep_obat_pasien.pendaftaran_id', $pendaftaran_pasien->id)

@@ -553,7 +553,7 @@
                             </table>
                         </div>
                     </div>
-                    @if(!in_array($data->status, ['baru']) && $resep_line != null)
+                    @if(!in_array($data->status, ['baru']))
                     <div class="tab-pane fade" id="emr-tabs-resep-obat" role="tabpanel" aria-labelledby="emr-tabs-resep-obat-tab">
                         <div>
                             <table id="tabel_riwayat_tindakan" class="table table-bordered table-hover">
