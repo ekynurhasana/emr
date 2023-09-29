@@ -556,7 +556,7 @@
                     @if(!in_array($data->status, ['baru']))
                     <div class="tab-pane fade" id="emr-tabs-resep-obat" role="tabpanel" aria-labelledby="emr-tabs-resep-obat-tab">
                         <div>
-                            <table id="tabel_riwayat_tindakan" class="table table-bordered table-hover">
+                            <table id="tabel_riwayat_obat" class="table table-bordered table-hover">
                                 <thead>
                                     <tr>
                                         <th class="text-center" style="width: 10%">No. Resep</th>
@@ -806,6 +806,12 @@
 <script>
     $(function () {
         $("#tabel_riwayat").DataTable({
+            "responsive": true, "lengthChange": false, "autoWidth": false,
+            "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+        }).buttons().container().appendTo('#tabel_riwayat_wrapper .col-md-6:eq(0)');
+    });
+    $(function () {
+        $("#tabel_riwayat_obat").DataTable({
             "responsive": true, "lengthChange": false, "autoWidth": false,
             "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
         }).buttons().container().appendTo('#tabel_riwayat_wrapper .col-md-6:eq(0)');
