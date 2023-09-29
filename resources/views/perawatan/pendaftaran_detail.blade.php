@@ -814,7 +814,7 @@
         $("#tabel_riwayat_obat").DataTable({
             "responsive": true, "lengthChange": false, "autoWidth": false,
             "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
-        }).buttons().container().appendTo('#tabel_riwayat_wrapper .col-md-6:eq(0)');
+        }).buttons().container().appendTo('#tabel_riwayat_obat_wrapper .col-md-6:eq(0)');
     });
     $('#modal-hapus-riwayat').on('show.bs.modal', function (event) {
         var button = $(event.relatedTarget)
